@@ -1,1 +1,369 @@
-elfellaq
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نموذج الانخراط | Formulaire d'adhésion</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cairo for Arabic, Inter for French/Latin -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: 'rgba(255, 255, 255, 0.05)',
+                        glassBorder: 'rgba(255, 255, 255, 0.1)',
+                        primary: '#3b82f6',
+                        primaryHover: '#2563eb',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Animated Background */
+        body {
+            background: #0f172a;
+            overflow-x: hidden;
+        }
+        .bg-animated {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            overflow: hidden;
+        }
+        .bg-animated::before, .bg-animated::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 15s infinite ease-in-out;
+        }
+        .bg-animated::before {
+            width: clamp(300px, 50vw, 600px);
+            height: clamp(300px, 50vw, 600px);
+            background: #3b82f6;
+            top: -10%;
+            right: -10%;
+            animation-delay: 0s;
+        }
+        .bg-animated::after {
+            width: clamp(200px, 40vw, 500px);
+            height: clamp(200px, 40vw, 500px);
+            background: #8b5cf6;
+            bottom: -10%;
+            left: -10%;
+            animation-delay: -7s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Glassmorphism Form */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Input Styling */
+        .input-field {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+            font-family: 'Inter', sans-serif; /* French placeholders */
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #ffffff;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success Animation */
+        .success-checkmark {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #10b981;
+            margin: 0 auto;
+            position: relative;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .success-checkmark::after {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 10px;
+            width: 12px;
+            height: 24px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Prevent iOS zoom on focus */
+        @media screen and (max-width: 768px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 text-white">
+
+    <!-- Animated Background -->
+    <div class="bg-animated"></div>
+
+    <!-- Main Form Container -->
+    <main class="w-full max-w-[min(550px,95vw)] glass-card rounded-2xl p-6 sm:p-8 lg:p-10 relative overflow-hidden">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-2xl sm:text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                نموذج الانخراط الجديد
+            </h1>
+            <p class="text-gray-400 text-sm sm:text-base font-['Inter']">
+                Formulaire d'adhésion - Jeunesse Indépendante
+            </p>
+        </div>
+
+        <!-- Form -->
+        <form id="adhesionForm" class="space-y-5" novalidate>
+            
+            <!-- Nom Complet -->
+            <div class="space-y-1.5">
+                <label for="fullname" class="block text-sm font-semibold text-gray-300">
+                    الاسم الكامل <span class="text-gray-500 font-['Inter'] text-xs">(Nom Complet)</span>
+                </label>
+                <input type="text" id="fullname" name="fullname" required
+                    class="input-field w-full rounded-lg px-4 py-3 text-white placeholder-gray-500"
+                    placeholder="Ex: Ahmed Alami">
+                <p class="text-red-400 text-xs hidden" id="error-fullname">يرجى إدخال الاسم الكامل</p>
+            </div>
+
+            <!-- Téléphone -->
+            <div class="space-y-1.5">
+                <label for="phone" class="block text-sm font-semibold text-gray-300">
+                    رقم الهاتف <span class="text-gray-500 font-['Inter'] text-xs">(Téléphone)</span>
+                </label>
+                <input type="tel" id="phone" name="phone" required pattern="^[0-9]{10,15}$"
+                    class="input-field w-full rounded-lg px-4 py-3 text-white placeholder-gray-500"
+                    placeholder="Ex: 0612345678">
+                <p class="text-red-400 text-xs hidden" id="error-phone">يرجى إدخال رقم هاتف صحيح (10 أرقام على الأقل)</p>
+            </div>
+
+            <!-- Email -->
+            <div class="space-y-1.5">
+                <label for="email" class="block text-sm font-semibold text-gray-300">
+                    البريد الإلكتروني <span class="text-gray-500 font-['Inter'] text-xs">(Adresse E-mail)</span>
+                </label>
+                <input type="email" id="email" name="email" required
+                    class="input-field w-full rounded-lg px-4 py-3 text-white placeholder-gray-500"
+                    placeholder="Ex: ahmed@example.com">
+                <p class="text-red-400 text-xs hidden" id="error-email">يرجى إدخال بريد إلكتروني صحيح</p>
+            </div>
+
+            <!-- Fonction / Poste -->
+            <div class="space-y-1.5">
+                <label for="position" class="block text-sm font-semibold text-gray-300">
+                    الصفة / المنصب <span class="text-gray-500 font-['Inter'] text-xs">(Fonction / Poste)</span>
+                </label>
+                <select id="position" name="position" required
+                    class="input-field w-full rounded-lg px-4 py-3 text-white bg-transparent appearance-none cursor-pointer">
+                    <option value="" disabled selected class="bg-slate-800 text-gray-400">اختر الصفة...</option>
+                    <option value="membre" class="bg-slate-800">عضو بسيط (Membre simple)</option>
+                    <option value="responsable" class="bg-slate-800">مسؤول محلي (Responsable local)</option>
+                    <option value="coordinateur" class="bg-slate-800">منسق (Coordinateur)</option>
+                    <option value="autre" class="bg-slate-800">أخرى (Autre)</option>
+                </select>
+                <p class="text-red-400 text-xs hidden" id="error-position">يرجى اختيار الصفة</p>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn"
+                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3.5 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 mt-6">
+                <span class="spinner" id="spinner"></span>
+                <span id="btnText">تأكيد الانخراط <span class="font-['Inter'] text-sm opacity-80">(Confirmer)</span></span>
+            </button>
+
+        </form>
+
+        <!-- Success Message (Hidden by default) -->
+        <div id="successMessage" class="hidden text-center py-8">
+            <div class="success-checkmark mb-4"></div>
+            <h2 class="text-2xl font-bold text-emerald-400 mb-2">تم التسجيل بنجاح!</h2>
+            <p class="text-gray-400 font-['Inter']">Inscription réussie avec succès.</p>
+            <button onclick="resetForm()" class="mt-6 text-sm text-blue-400 hover:text-blue-300 underline font-['Inter']">
+                Ajouter une nouvelle entrée
+            </button>
+        </div>
+
+        <!-- Error Message (Hidden by default) -->
+        <div id="errorMessage" class="hidden mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-center">
+            <p class="text-red-400 text-sm">حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.<br><span class="font-['Inter'] text-xs">(Erreur de connexion)</span></p>
+        </div>
+
+    </main>
+
+    <script>
+        // ⚠️ استبدل هذا الرابط برابط Web App الخاص بك من Google Apps Script
+        // أو استبدل منطق الـ fetch بالكامل باستدعاء Supabase (مثال: supabase.from('workers').insert(...))
+        const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+        const form = document.getElementById('adhesionForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('spinner');
+        const btnText = document.getElementById('btnText');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Real-time validation helper
+        const validateField = (input, errorId, condition) => {
+            const errorEl = document.getElementById(errorId);
+            if (!condition) {
+                errorEl.classList.remove('hidden');
+                input.classList.add('border-red-500');
+                return false;
+            } else {
+                errorEl.classList.add('hidden');
+                input.classList.remove('border-red-500');
+                return true;
+            }
+        };
+
+        // Attach real-time validation
+        document.getElementById('fullname').addEventListener('input', function() {
+            validateField(this, 'error-fullname', this.value.trim().length >= 3);
+        });
+        document.getElementById('phone').addEventListener('input', function() {
+            validateField(this, 'error-phone', /^[0-9]{10,15}$/.test(this.value.trim()));
+        });
+        document.getElementById('email').addEventListener('input', function() {
+            validateField(this, 'error-email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value.trim()));
+        });
+        document.getElementById('position').addEventListener('change', function() {
+            validateField(this, 'error-position', this.value !== '');
+        });
+
+        // Form Submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMessage.classList.add('hidden');
+
+            const fullname = document.getElementById('fullname').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const position = document.getElementById('position').value;
+
+            // Final validation check
+            const isNameValid = validateField(document.getElementById('fullname'), 'error-fullname', fullname.length >= 3);
+            const isPhoneValid = validateField(document.getElementById('phone'), 'error-phone', /^[0-9]{10,15}$/.test(phone));
+            const isEmailValid = validateField(document.getElementById('email'), 'error-email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+            const isPositionValid = validateField(document.getElementById('position'), 'error-position', position !== '');
+
+            if (!isNameValid || !isPhoneValid || !isEmailValid || !isPositionValid) {
+                return; // Stop if validation fails
+            }
+
+            // Set Loading State
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+            spinner.style.display = 'block';
+            btnText.textContent = 'جاري الإرسال... (Envoi en cours)';
+
+            const payload = {
+                fullname: fullname,
+                phone: phone,
+                email: email,
+                position: position
+            };
+
+            try {
+                // Note: Google Apps Script requires 'text/plain' to avoid CORS preflight (OPTIONS) issues
+                // If using Supabase, replace this block with: await supabase.from('adhesions').insert(payload)
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Required for GAS to avoid CORS errors in browser
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                // Since mode is 'no-cors', we assume success if no network error is thrown
+                showSuccess();
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                errorMessage.classList.remove('hidden');
+                resetButtonState();
+            }
+        });
+
+        function showSuccess() {
+            form.classList.add('hidden');
+            successMessage.classList.remove('hidden');
+            document.querySelector('.success-checkmark').style.display = 'block';
+            resetButtonState();
+        }
+
+        function resetButtonState() {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+            spinner.style.display = 'none';
+            btnText.innerHTML = 'تأكيد الانخراط <span class="font-[\'Inter\'] text-sm opacity-80">(Confirmer)</span>';
+        }
+
+        function resetForm() {
+            form.reset();
+            form.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+            document.querySelectorAll('.input-field').forEach(input => {
+                input.classList.remove('border-red-500');
+            });
+            document.querySelectorAll('[id^="error-"]').forEach(el => el.classList.add('hidden'));
+        }
+    </script>
+</body>
+</html>
