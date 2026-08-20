@@ -120,7 +120,7 @@
 
     <!-- Gabarit PDF (rempli à la volée pour chaque candidat) -->
     <div id="pdfTemplate" aria-hidden="true">
-        <div style="background: linear-gradient(135deg, #E91E63, #C2185B); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
+        <div class="pdf-keep" style="background: linear-gradient(135deg, #E91E63, #C2185B); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
             <h1 style="color: white; font-size: 28px; margin-bottom: 10px; font-weight: 800;">منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</h1>
             <h2 style="color: #FCE4EC; font-size: 20px; margin-bottom: 5px;">ISTIQLAL PARTY</h2>
             <p style="color: white; font-size: 18px; margin-top: 15px;">استمارة انخراط الشبيبة الاستقلالية</p>
@@ -131,10 +131,10 @@
         </div>
         <div id="pdfContent"></div>
         <div style="margin-top: 40px; padding-top: 20px; border-top: 3px solid #E91E63;">
-            <div style="background: #FCE4EC; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <div class="pdf-keep" style="background: #FCE4EC; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
                 <p style="color: #C2185B; font-weight: bold; font-size: 16px;">✓ تم تأكيد صحة المعلومات والالتزام بقوانين منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</p>
             </div>
-            <div style="display: flex; justify-content: space-between; gap: 20px; margin: 25px 0;">
+            <div class="pdf-keep" style="display: flex; justify-content: space-between; gap: 20px; margin: 25px 0;">
                 <div style="flex: 1; text-align: center; border: 1px dashed #ccc; border-radius: 8px; padding: 12px; min-height: 90px;">
                     <p style="color: #666; font-size: 13px;">توقيع المنخرط(ة)</p>
                 </div>
@@ -142,7 +142,7 @@
                     <p style="color: #666; font-size: 13px;">توقيع وخاتم المنظمة</p>
                 </div>
             </div>
-            <div style="text-align: center; margin: 25px 0; padding: 15px; border-top: 1px solid #ddd;">
+            <div class="pdf-keep" style="text-align: center; margin: 25px 0; padding: 15px; border-top: 1px solid #ddd;">
                 <p style="color: #666; font-size: 14px; margin-bottom: 5px;">تم التصميم بواسطة</p>
                 <p style="color: #E91E63; font-size: 18px; font-weight: bold;">محمد الفلاق</p>
                 <p style="color: #999; font-size: 12px; margin-top: 5px;">Conçu par Mohamed Elfellaq</p>
@@ -252,8 +252,8 @@
                 '<tr><td style="padding:10px;border-bottom:1px solid #eee;color:#666;width:35%;' + (top ? 'vertical-align:top;' : '') + '"><strong>' + k + '</strong></td>' +
                 '<td style="padding:10px;border-bottom:1px solid #eee;font-weight:bold;word-break:break-word;">' + esc(v) + '</td></tr>';
             const block = (icon, title, rows) =>
-                '<div style="margin-bottom:25px;">' +
-                    '<h3 style="color:#E91E63;font-size:22px;margin-bottom:15px;border-right:5px solid #E91E63;padding-right:15px;">' + icon + ' ' + title + '</h3>' +
+                '<div class="pdf-block" style="margin-bottom:25px;">' +
+                    '<h3 class="pdf-keep" style="color:#E91E63;font-size:22px;margin-bottom:15px;border-right:5px solid #E91E63;padding-right:15px;">' + icon + ' ' + title + '</h3>' +
                     '<table style="width:100%;border-collapse:collapse;">' + rows + '</table>' +
                 '</div>';
 
@@ -295,24 +295,67 @@
             template.style.left = '0';
             template.style.top = '0';
             try {
+                // 1) Points de coupe sûrs : bas de chaque ligne, haut/bas de chaque bloc insécable
+                const tTop = template.getBoundingClientRect().top;
+                const cssCuts = [];
+                template.querySelectorAll('tr, .pdf-block, .pdf-keep').forEach(el => {
+                    const r = el.getBoundingClientRect();
+                    cssCuts.push(r.top - tTop);
+                    cssCuts.push(r.bottom - tTop);
+                });
+
                 const canvas = await html2canvas(template, {
                     scale: 2, useCORS: true, logging: false,
                     backgroundColor: '#ffffff', width: 800, windowWidth: 900
                 });
+
+                // 2) Conversion px CSS → px canvas
+                const k = canvas.width / template.offsetWidth;
+                const cuts = cssCuts.map(v => v * k).filter(v => v > 0 && v < canvas.height);
+                cuts.push(canvas.height);
+                cuts.sort((a, b) => a - b);
+
+                // 3) Géométrie de la page
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 210, pageHeight = 297;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight, position = 0;
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+                const marginMm = 8;
+                const contentWmm = 210 - 2 * marginMm;
+                const contentHmm = 297 - 2 * marginMm;
+                const pxPerMm = canvas.width / contentWmm;
+                const pageSlicePx = contentHmm * pxPerMm;
+
+                // 4) Découpe : on ne coupe jamais au milieu d'une ligne
+                const slice = document.createElement('canvas');
+                const ctx = slice.getContext('2d');
+                let y = 0, first = true;
+
+                while (y < canvas.height - 2) {
+                    const target = y + pageSlicePx;
+                    let cut;
+                    if (target >= canvas.height) {
+                        cut = canvas.height;
+                    } else {
+                        cut = 0;
+                        for (let i = 0; i < cuts.length; i++) {
+                            if (cuts[i] > y + pageSlicePx * 0.25 && cuts[i] <= target) cut = cuts[i];
+                        }
+                        if (!cut) cut = target; // aucun point sûr → coupe brute (bloc plus haut qu'une page)
+                    }
+
+                    const h = Math.max(1, Math.round(cut - y));
+                    slice.width = canvas.width;
+                    slice.height = h;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, slice.width, slice.height);
+                    ctx.drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
+
+                    if (!first) pdf.addPage();
+                    first = false;
+                    pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG',
+                                 marginMm, marginMm, contentWmm, h / pxPerMm);
+                    y = cut;
                 }
+
                 const safeName = String(c.fullname || 'منخرط').replace(/[\\/:*?"<>|]/g, '_').trim();
                 pdf.save('انخراط_' + safeName + '.pdf');
             } finally {
