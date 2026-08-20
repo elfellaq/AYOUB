@@ -11,7 +11,15 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+        /* FIX 1 : blocage du scroll horizontal au niveau html + body (RTL) */
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
         body {
             background: linear-gradient(135deg, #1A1A1A 0%, #2D1F2E 50%, #1A1A1A 100%);
             min-height: 100vh;
@@ -19,9 +27,12 @@
             font-family: 'Cairo', sans-serif;
             overflow-x: hidden;
             width: 100%;
+            max-width: 100%;
         }
+
+        /* FIX 2 : inset:0 au lieu de 100vw/100vh (100vw inclut la scrollbar) */
         .bg-animated {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1;
             background: linear-gradient(135deg, #1A1A1A 0%, #2D1F2E 100%);
             overflow: hidden; pointer-events: none;
         }
@@ -54,7 +65,7 @@
             background: rgba(45, 45, 45, 0.7);
             border: 2px solid rgba(233, 30, 99, 0.3);
             transition: all 0.3s ease;
-            color: white; width: 100%;
+            color: white; width: 100%; max-width: 100%;
             -webkit-appearance: none; -moz-appearance: none; appearance: none;
         }
         .input-field:focus {
@@ -136,12 +147,20 @@
             padding: 12px; border-radius: 8px; margin-bottom: 10px;
             word-wrap: break-word; overflow-wrap: break-word;
         }
-        .g-recaptcha { margin: 20px 0; display: flex; justify-content: center; transform: scale(0.9); transform-origin: center; }
-        .g-recaptcha > div { margin: 0 auto; }
+
+        /* FIX 3 : le reCAPTCHA fait ~304px de large en layout — scale() ne change pas ça.
+           On l'enferme dans un wrapper qui coupe le débordement. */
+        .captcha-wrap {
+            width: 100%; max-width: 100%; overflow: hidden;
+            display: flex; justify-content: center;
+        }
+        .g-recaptcha { margin: 20px 0; transform: scale(0.9); transform-origin: center; }
+
         .responsive-title { font-size: clamp(1.5rem, 5vw, 2.25rem); }
         .responsive-subtitle { font-size: clamp(1rem, 3vw, 1.25rem); }
         .responsive-text { font-size: clamp(0.875rem, 2.5vw, 1rem); }
-        .no-overflow { overflow-x: hidden; max-width: 100vw; }
+        .no-overflow { overflow-x: hidden; max-width: 100%; }
+
         @media screen and (max-width: 640px) {
             .glass-card { padding: 1.5rem !important; border-radius: 1.5rem !important; }
             .step-indicator { width: 32px; height: 32px; font-size: 12px; }
@@ -164,19 +183,32 @@
         @media screen and (max-width: 768px) {
             input, select, textarea, button { font-size: 16px !important; }
         }
+
+        /* FIX 4 : position fixed (hors du flux de scroll) + largeur fixe 800px pour le rendu PDF.
+           En RTL, un left:-9999px en position:absolute crée une zone scrollable vers la gauche. */
         #pdfTemplate {
-            position: absolute; left: -9999px; top: 0; width: 100%; max-width: 800px;
-            background: white; color: #1A1A1A; font-family: 'Cairo', sans-serif;
-            direction: rtl; padding: 40px; box-sizing: border-box;
+            position: fixed;
+            left: -9999px;
+            top: 0;
+            width: 800px;
+            max-width: none;
+            background: white;
+            color: #1A1A1A;
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+            padding: 40px;
+            box-sizing: border-box;
+            z-index: -9999;
+            pointer-events: none;
         }
     </style>
 </head>
 <body class="flex items-center justify-center p-2 sm:p-4 md:p-6 text-white no-overflow">
-
     <div class="bg-animated"></div>
 
-    <main class="w-full max-w-[min(700px,95vw,calc(100vw-1rem))] glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 relative overflow-hidden my-4 sm:my-10">
-        
+    <!-- FIX 5 : max-w fixe au lieu de min(...,95vw,calc(100vw - 1rem)) — 100vw inclut la scrollbar -->
+    <main class="w-full max-w-[700px] glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 relative overflow-hidden my-4 sm:my-10">
+
         <div class="party-logo">
             <svg class="scales-icon" viewBox="0 0 24 24">
                 <path d="M12 2C12.55 2 13 2.45 13 3V6H19C19.55 6 20 6.45 20 7C20 7.55 19.55 8 19 8H17V14H20C20.55 14 21 14.45 21 15C21 15.55 20.55 16 20 16H4C3.45 16 3 15.55 3 15C3 14.45 3.45 14 4 14H7V8H5C4.45 8 4 7.55 4 7C4 6.45 4.45 6 5 6H11V3C11 2.45 11.45 2 12 2M7 8V14H17V8H7M9 18H11V22H9V18M13 18H15V22H13V18Z"/>
@@ -198,21 +230,22 @@
                 <div class="step-indicator" data-step="4">4</div>
                 <div class="step-indicator" data-step="5">5</div>
             </div>
+            <!-- FIX 6 : xs: n'existe pas dans Tailwind CDN par défaut → les libellés ne s'affichaient jamais -->
             <div class="flex justify-between text-xs text-gray-400 mt-2 px-1 step-labels">
-                <span class="hidden xs:block">الشخصية</span>
-                <span class="hidden xs:block">الاتصال</span>
-                <span class="hidden xs:block">المهنية</span>
-                <span class="hidden xs:block">الحزبية</span>
-                <span class="hidden xs:block">التأكيد</span>
+                <span class="hidden sm:block">الشخصية</span>
+                <span class="hidden sm:block">الاتصال</span>
+                <span class="hidden sm:block">المهنية</span>
+                <span class="hidden sm:block">الحزبية</span>
+                <span class="hidden sm:block">التأكيد</span>
             </div>
         </div>
 
         <form id="multiStepForm" novalidate>
-            
+
             <div class="step-content active" data-step="1">
                 <h2 class="text-xl sm:text-2xl font-bold text-pink-300 mb-4 sm:mb-6 flex items-center gap-2 flex-wrap">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm flex-shrink-0">1</span>
-                    <span class="whitespace-nowrap">المعلومات الشخصية</span>
+                    <span>المعلومات الشخصية</span>
                 </h2>
                 <div class="space-y-3 sm:space-y-4">
                     <div>
@@ -249,7 +282,7 @@
             <div class="step-content" data-step="2">
                 <h2 class="text-xl sm:text-2xl font-bold text-pink-300 mb-4 sm:mb-6 flex items-center gap-2 flex-wrap">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm flex-shrink-0">2</span>
-                    <span class="whitespace-nowrap">معلومات الاتصال</span>
+                    <span>معلومات الاتصال</span>
                 </h2>
                 <div class="space-y-3 sm:space-y-4">
                     <div>
@@ -270,7 +303,7 @@
             <div class="step-content" data-step="3">
                 <h2 class="text-xl sm:text-2xl font-bold text-pink-300 mb-4 sm:mb-6 flex items-center gap-2 flex-wrap">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm flex-shrink-0">3</span>
-                    <span class="whitespace-nowrap">المعلومات المهنية والدراسية</span>
+                    <span>المعلومات المهنية والدراسية</span>
                 </h2>
                 <div class="space-y-3 sm:space-y-4">
                     <div>
@@ -308,7 +341,7 @@
             <div class="step-content" data-step="4">
                 <h2 class="text-xl sm:text-2xl font-bold text-pink-300 mb-4 sm:mb-6 flex items-center gap-2 flex-wrap">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm flex-shrink-0">4</span>
-                    <span class="whitespace-nowrap">المعلومات الحزبية</span>
+                    <span>المعلومات الحزبية</span>
                 </h2>
                 <div class="space-y-3 sm:space-y-4">
                     <div>
@@ -352,7 +385,7 @@
             <div class="step-content" data-step="5">
                 <h2 class="text-xl sm:text-2xl font-bold text-pink-300 mb-4 sm:mb-6 flex items-center gap-2 flex-wrap">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm flex-shrink-0">5</span>
-                    <span class="whitespace-nowrap">المراجعة والتأكيد</span>
+                    <span>المراجعة والتأكيد</span>
                 </h2>
                 <div class="bg-gray-800/30 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-3 sm:mb-4">
                     <h3 class="text-base sm:text-lg font-bold text-pink-400 mb-3">المعلومات الشخصية</h3>
@@ -376,12 +409,15 @@
                         أؤكد صحة المعلومات وألتزم بقوانين حزب الاستقلال
                     </label>
                 </div>
-                
-                <div class="g-recaptcha mt-4 sm:mt-6" data-sitekey="6Lcf9o4tAAAAABQ-Leme5OL1hOI8TGJtew0ExFyA"></div>
+
+                <div class="captcha-wrap mt-4 sm:mt-6">
+                    <div class="g-recaptcha" data-sitekey="6Lcf9o4tAAAAABQ-Leme5OL1hOI8TGJtew0ExFyA"></div>
+                </div>
                 <p id="captchaError" class="text-red-400 text-sm text-center hidden">يرجى إتمام التحقق من reCAPTCHA</p>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-700">
+            <!-- FIX 7 : id explicite (resetForm ciblait '.flex.flex-col' — trop fragile) -->
+            <div id="navButtons" class="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-700">
                 <button type="button" id="prevBtn" onclick="changeStep(-1)" class="btn-secondary py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-bold hidden">
                     السابق
                 </button>
@@ -404,22 +440,23 @@
                 <p class="text-sm text-gray-400 mb-2">سيتم التواصل معك على:</p>
                 <p class="text-pink-400 font-bold text-sm sm:text-base break-all" id="successContact"></p>
             </div>
-            
+
             <button onclick="generateArabicPDF()" id="pdfBtn"
                 class="btn-pdf px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-bold flex items-center justify-center gap-2 mx-auto mb-3 sm:mb-4 w-full sm:w-auto">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
                 <span id="pdfBtnText">تحميل نسخة PDF</span>
             </button>
-            
+
             <button onclick="resetForm()" class="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-pink-500 text-pink-400 rounded-lg sm:rounded-xl hover:bg-pink-500 hover:text-white transition-all duration-300 font-bold w-full sm:w-auto">
                 تسجيل انخراط جديد
             </button>
         </div>
     </main>
 
-    <div id="pdfTemplate" style="position: absolute; left: -9999px; top: 0; width: 100%; max-width: 800px; background: white; color: #1A1A1A; font-family: 'Cairo', sans-serif; direction: rtl; padding: 40px; box-sizing: border-box;">
+    <!-- FIX 8 : plus de style inline (il écrasait le CSS) -->
+    <div id="pdfTemplate" aria-hidden="true">
         <div style="background: linear-gradient(135deg, #E91E63, #C2185B); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
             <h1 style="color: white; font-size: 36px; margin-bottom: 10px; font-weight: 800;">حزب الاستقلال</h1>
             <h2 style="color: #FCE4EC; font-size: 20px; margin-bottom: 5px;">ISTIQLAL PARTY</h2>
@@ -457,6 +494,7 @@
                 indicator.classList.remove('active', 'completed');
                 if (stepNum === currentStep) {
                     indicator.classList.add('active');
+                    indicator.innerHTML = stepNum;
                 } else if (stepNum < currentStep) {
                     indicator.classList.add('completed');
                     indicator.innerHTML = '✓';
@@ -468,9 +506,9 @@
 
         function changeStep(direction) {
             if (direction === 1 && !validateStep(currentStep)) return;
-            document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.remove('active');
+            document.querySelector('.step-content[data-step="' + currentStep + '"]').classList.remove('active');
             currentStep += direction;
-            document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
+            document.querySelector('.step-content[data-step="' + currentStep + '"]').classList.add('active');
             updateButtons();
             updateProgress();
             if (currentStep === 5) populateReview();
@@ -485,7 +523,7 @@
 
         function validateStep(step) {
             let isValid = true;
-            const stepContent = document.querySelector(`.step-content[data-step="${step}"]`);
+            const stepContent = document.querySelector('.step-content[data-step="' + step + '"]');
             const inputs = stepContent.querySelectorAll('input[required], select[required], textarea[required]');
             inputs.forEach(input => {
                 if (!input.value.trim()) {
@@ -501,75 +539,88 @@
         function populateReview() {
             const formData = new FormData(document.getElementById('multiStepForm'));
             const data = Object.fromEntries(formData);
-            document.getElementById('review-personal').innerHTML = `
-                <div class="review-item"><span class="text-gray-400 text-sm">الاسم الكامل:</span><p class="font-semibold">${data.fullname || '-'}</p></div>
-                <div class="review-item"><span class="text-gray-400 text-sm">تاريخ الازدياد:</span><p class="font-semibold">${data.birthdate || '-'}</p></div>
-                <div class="review-item"><span class="text-gray-400 text-sm">المدينة:</span><p class="font-semibold">${data.city || '-'}</p></div>
-            `;
-            document.getElementById('review-contact').innerHTML = `
-                <div class="review-item"><span class="text-gray-400 text-sm">الهاتف:</span><p class="font-semibold">${data.phone || '-'}</p></div>
-                <div class="review-item"><span class="text-gray-400 text-sm">البريد الإلكتروني:</span><p class="font-semibold">${data.email || '-'}</p></div>
-            `;
-            document.getElementById('review-professional').innerHTML = `
-                <div class="review-item"><span class="text-gray-400 text-sm">المستوى الدراسي:</span><p class="font-semibold">${data.education || '-'}</p></div>
-                <div class="review-item"><span class="text-gray-400 text-sm">الوضعية المهنية:</span><p class="font-semibold">${data.jobStatus || '-'}</p></div>
-            `;
-            document.getElementById('review-party').innerHTML = `
-                <div class="review-item"><span class="text-gray-400 text-sm">الصفة:</span><p class="font-semibold">${data.position || '-'}</p></div>
-            `;
+            document.getElementById('review-personal').innerHTML =
+                '<div class="review-item"><span class="text-gray-400 text-sm">الاسم الكامل:</span><p class="font-semibold">' + (data.fullname || '-') + '</p></div>' +
+                '<div class="review-item"><span class="text-gray-400 text-sm">تاريخ الازدياد:</span><p class="font-semibold">' + (data.birthdate || '-') + '</p></div>' +
+                '<div class="review-item"><span class="text-gray-400 text-sm">المدينة:</span><p class="font-semibold">' + (data.city || '-') + '</p></div>';
+            document.getElementById('review-contact').innerHTML =
+                '<div class="review-item"><span class="text-gray-400 text-sm">الهاتف:</span><p class="font-semibold">' + (data.phone || '-') + '</p></div>' +
+                '<div class="review-item"><span class="text-gray-400 text-sm">البريد الإلكتروني:</span><p class="font-semibold">' + (data.email || '-') + '</p></div>';
+            document.getElementById('review-professional').innerHTML =
+                '<div class="review-item"><span class="text-gray-400 text-sm">المستوى الدراسي:</span><p class="font-semibold">' + (data.education || '-') + '</p></div>' +
+                '<div class="review-item"><span class="text-gray-400 text-sm">الوضعية المهنية:</span><p class="font-semibold">' + (data.jobStatus || '-') + '</p></div>';
+            document.getElementById('review-party').innerHTML =
+                '<div class="review-item"><span class="text-gray-400 text-sm">الصفة:</span><p class="font-semibold">' + (data.position || '-') + '</p></div>';
         }
 
         async function generateArabicPDF() {
             const btn = document.getElementById('pdfBtn');
             const btnText = document.getElementById('pdfBtnText');
             const originalText = btnText.textContent;
+            const template = document.getElementById('pdfTemplate');
             btn.disabled = true;
             btnText.textContent = 'جاري إنشاء PDF...';
+
             try {
                 const now = new Date();
                 const dateStr = now.toLocaleDateString('ar-MA', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                 document.getElementById('pdfDate').textContent = dateStr;
-                const content = document.getElementById('pdfContent');
-                content.innerHTML = `
-                    <div style="margin-bottom: 25px;">
-                        <h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">📋 المعلومات الشخصية</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>الاسم الكامل:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; word-break: break-word;">${formDataGlobal.fullname || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>تاريخ الازدياد:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.birthdate || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>مكان الازدياد:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.birthplace || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>العنوان:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; word-break: break-word;">${formDataGlobal.address || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>المدينة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.city || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>الجهة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.region || '-'}</td></tr>
-                        </table>
-                    </div>
-                    <div style="margin-bottom: 25px;">
-                        <h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">📞 معلومات الاتصال</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>رقم الهاتف:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.phone || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>البريد الإلكتروني:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; word-break: break-all;">${formDataGlobal.email || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>البريد البديل:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; word-break: break-all;">${formDataGlobal.email2 || '-'}</td></tr>
-                        </table>
-                    </div>
-                    <div style="margin-bottom: 25px;">
-                        <h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">💼 المعلومات المهنية والدراسية</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>المستوى الدراسي:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.education || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>التخصص:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.specialty || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>الوضعية المهنية:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.jobStatus || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>المهنة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.profession || '-'}</td></tr>
-                        </table>
-                    </div>
-                    <div style="margin-bottom: 25px;">
-                        <h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">🎯 المعلومات الحزبية</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>الصفة المطلوبة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.position || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>الدوافع:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; word-break: break-word;">${formDataGlobal.motivation || '-'}</td></tr>
-                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>المجالات:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.interests || '-'}</td></tr>
-                        </table>
-                    </div>
-                `;
-                const template = document.getElementById('pdfTemplate');
-                const canvas = await html2canvas(template, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' });
+
+                document.getElementById('pdfContent').innerHTML =
+                    '<div style="margin-bottom: 25px;">' +
+                        '<h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">📋 المعلومات الشخصية</h3>' +
+                        '<table style="width: 100%; border-collapse: collapse;">' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>الاسم الكامل:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; word-break: break-word;">' + (formDataGlobal.fullname || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>تاريخ الازدياد:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.birthdate || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>مكان الازدياد:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.birthplace || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>العنوان:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; word-break: break-word;">' + (formDataGlobal.address || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>المدينة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.city || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>الجهة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.region || '-') + '</td></tr>' +
+                        '</table>' +
+                    '</div>' +
+                    '<div style="margin-bottom: 25px;">' +
+                        '<h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">📞 معلومات الاتصال</h3>' +
+                        '<table style="width: 100%; border-collapse: collapse;">' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>رقم الهاتف:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.phone || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>البريد الإلكتروني:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; word-break: break-all;">' + (formDataGlobal.email || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>البريد البديل:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; word-break: break-all;">' + (formDataGlobal.email2 || '-') + '</td></tr>' +
+                        '</table>' +
+                    '</div>' +
+                    '<div style="margin-bottom: 25px;">' +
+                        '<h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">💼 المعلومات المهنية والدراسية</h3>' +
+                        '<table style="width: 100%; border-collapse: collapse;">' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>المستوى الدراسي:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.education || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>التخصص:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.specialty || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>الوضعية المهنية:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.jobStatus || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>المهنة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.profession || '-') + '</td></tr>' +
+                        '</table>' +
+                    '</div>' +
+                    '<div style="margin-bottom: 25px;">' +
+                        '<h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">🎯 المعلومات الحزبية</h3>' +
+                        '<table style="width: 100%; border-collapse: collapse;">' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>الصفة المطلوبة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.position || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>الدوافع:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; word-break: break-word;">' + (formDataGlobal.motivation || '-') + '</td></tr>' +
+                            '<tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>المجالات:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">' + (formDataGlobal.interests || '-') + '</td></tr>' +
+                        '</table>' +
+                    '</div>';
+
+                // html2canvas ne gère pas bien position:fixed → on bascule en absolute le temps du rendu
+                template.style.position = 'absolute';
+                template.style.left = '0';
+                template.style.top = '0';
+
+                const canvas = await html2canvas(template, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    width: 800,
+                    windowWidth: 900
+                });
+
+                template.style.position = 'fixed';
+                template.style.left = '-9999px';
+
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const imgData = canvas.toDataURL('image/png');
@@ -578,6 +629,7 @@
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
                 let heightLeft = imgHeight;
                 let position = 0;
+
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
                 while (heightLeft >= 0) {
@@ -586,12 +638,15 @@
                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                 }
-                const filename = `انخراط_حزب_الاستقلال_${formDataGlobal.fullname || 'nouveau'}_${Date.now()}.pdf`;
-                pdf.save(filename);
+
+                pdf.save('انخراط_حزب_الاستقلال_' + (formDataGlobal.fullname || 'nouveau') + '_' + Date.now() + '.pdf');
                 btnText.textContent = '✓ تم تحميل PDF بنجاح';
                 setTimeout(() => { btnText.textContent = originalText; btn.disabled = false; }, 3000);
             } catch (error) {
                 console.error('PDF Generation Error:', error);
+                // restauration obligatoire ici aussi, sinon le template reste visible
+                template.style.position = 'fixed';
+                template.style.left = '-9999px';
                 alert('Erreur lors de la génération du PDF: ' + error.message);
                 btnText.textContent = originalText;
                 btn.disabled = false;
@@ -611,6 +666,7 @@
                 alert('يرجى تأكيد صحة المعلومات');
                 return;
             }
+
             const submitBtn = document.getElementById('submitBtn');
             const spinner = document.getElementById('spinner');
             const btnText = document.getElementById('btnText');
@@ -618,6 +674,7 @@
             submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
             spinner.style.display = 'block';
             btnText.textContent = 'جاري الإرسال...';
+
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
             data.recaptcha = recaptchaResponse;
@@ -625,6 +682,7 @@
             document.querySelectorAll('input[name="interests"]:checked').forEach(cb => interests.push(cb.value));
             data.interests = interests.join(', ');
             formDataGlobal = data;
+
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -633,7 +691,7 @@
                     body: JSON.stringify(data)
                 });
                 document.getElementById('multiStepForm').classList.add('hidden');
-                document.querySelector('.flex.flex-col').classList.add('hidden');
+                document.getElementById('navButtons').classList.add('hidden');
                 document.getElementById('successMessage').classList.remove('hidden');
                 document.getElementById('successContact').textContent = data.phone + ' - ' + data.email;
             } catch (error) {
@@ -647,16 +705,23 @@
         });
 
         function resetForm() {
-            document.getElementById('multiStepForm').reset();
-            document.getElementById('multiStepForm').classList.remove('hidden');
-            document.querySelector('.flex.flex-col').classList.remove('hidden');
+            const form = document.getElementById('multiStepForm');
+            form.reset();
+            form.classList.remove('hidden');
+            document.getElementById('navButtons').classList.remove('hidden');
             document.getElementById('successMessage').classList.add('hidden');
             if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('btnText').textContent = 'تأكيد الانخراط';
             currentStep = 1;
             document.querySelectorAll('.step-content').forEach(c => c.classList.remove('active'));
             document.querySelector('.step-content[data-step="1"]').classList.add('active');
             updateButtons();
             updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         updateButtons();
