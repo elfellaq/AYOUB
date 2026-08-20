@@ -373,6 +373,19 @@
                     <h3 class="text-base sm:text-lg font-bold text-pink-400 mb-3">المعلومات الحزبية</h3>
                     <div id="review-party" class="space-y-2"></div>
                 </div>
+                <div class="bg-gray-800/40 border border-gray-700 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-3 text-xs text-gray-400 leading-relaxed">
+                    <p class="text-pink-300 font-bold mb-2 text-sm">حماية المعطيات الشخصية</p>
+                    <p>تُجمع المعطيات المصرح بها في هذه الاستمارة من طرف منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب، لغرض تدبير ملفات الانخراط حصريا. تُحفظ لمدة العضوية ولا تُسلَّم لأي طرف ثالث.</p>
+                    <p class="mt-2">طبقا للقانون 09-08 المتعلق بحماية الأشخاص الذاتيين تجاه معالجة المعطيات ذات الطابع الشخصي، لك الحق في الولوج إلى معطياتك وتصحيحها والتعرض على معالجتها، عبر الاتصال بمقر المنظمة.</p>
+                </div>
+
+                <div class="flex items-start gap-3 p-3 sm:p-4 bg-pink-500/10 border border-pink-500/30 rounded-lg sm:rounded-xl mb-3">
+                    <input type="checkbox" id="consent" name="consent" required class="w-4 h-4 sm:w-5 sm:h-5 mt-1 rounded border-pink-500 flex-shrink-0">
+                    <label for="consent" class="text-sm text-pink-100">
+                        أوافق صراحة على جمع ومعالجة معطياتي الشخصية، بما فيها انتمائي السياسي، للغرض المذكور أعلاه
+                    </label>
+                </div>
+
                 <div class="flex items-start gap-3 p-3 sm:p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg sm:rounded-xl">
                     <input type="checkbox" id="confirm" name="confirm" required class="w-4 h-4 sm:w-5 sm:h-5 mt-1 rounded border-yellow-500 flex-shrink-0">
                     <label for="confirm" class="text-sm text-yellow-200">
@@ -573,6 +586,10 @@
                 return;
             }
             document.getElementById('captchaError').classList.add('hidden');
+            if (!document.getElementById('consent').checked) {
+                alert('يرجى الموافقة على معالجة المعطيات الشخصية');
+                return;
+            }
             if (!document.getElementById('confirm').checked) {
                 alert('يرجى تأكيد صحة المعلومات');
                 return;
@@ -581,6 +598,13 @@
             const submitBtn = document.getElementById('submitBtn');
             const spinner = document.getElementById('spinner');
             const btnText = document.getElementById('btnText');
+            const restore = () => {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                spinner.style.display = 'none';
+                btnText.textContent = 'تأكيد الانخراط';
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+            };
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
             spinner.style.display = 'block';
@@ -588,7 +612,10 @@
 
             const data = Object.fromEntries(new FormData(e.target));
             delete data.confirm;
+            delete data.consent;
             data.recaptcha = recaptchaResponse;
+            // Identifiant unique et imprévisible : sert à relire le verdict du serveur
+            data.nonce = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()).replace(/-/g, '');
             const interests = [];
             document.querySelectorAll('input[name="interests"]:checked').forEach(cb => interests.push(cb.value));
             data.interests = interests.join(', ');
@@ -600,25 +627,59 @@
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(data)
                 });
-                document.getElementById('multiStepForm').classList.add('hidden');
-                document.getElementById('navButtons').classList.add('hidden');
-                document.getElementById('successMessage').classList.remove('hidden');
-                document.getElementById('successContact').textContent = data.phone + (data.email ? ' - ' + data.email : '');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // no-cors empêche de lire la réponse → on relit le verdict par JSONP
+                btnText.textContent = 'جاري التأكد...';
+                const verdict = await pollAck(data.nonce);
+
+                if (verdict && verdict.ok) {
+                    document.getElementById('multiStepForm').classList.add('hidden');
+                    document.getElementById('navButtons').classList.add('hidden');
+                    document.getElementById('successMessage').classList.remove('hidden');
+                    document.getElementById('successContact').textContent = data.phone + (data.email ? ' - ' + data.email : '');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    alert(verdict && verdict.error ? verdict.error : 'تعذر تأكيد التسجيل. حاول مرة أخرى.');
+                    restore();
+                }
             } catch (error) {
                 console.error('Submission Error:', error);
                 alert('حدث خطأ أثناء الإرسال.');
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
-                spinner.style.display = 'none';
-                btnText.textContent = 'تأكيد الانخراط';
+                restore();
             }
         });
+
+        // JSONP : ne renvoie qu'un statut (ok / message d'erreur), aucune donnée personnelle
+        function jsonp(url) {
+            return new Promise((resolve, reject) => {
+                const cb = 'ack_' + Math.random().toString(36).slice(2);
+                const s = document.createElement('script');
+                const t = setTimeout(() => { clean(); reject(new Error('timeout')); }, 12000);
+                function clean() { clearTimeout(t); delete window[cb]; if (s.parentNode) s.parentNode.removeChild(s); }
+                window[cb] = d => { clean(); resolve(d); };
+                s.onerror = () => { clean(); reject(new Error('network')); };
+                s.src = url + '&callback=' + cb;
+                document.body.appendChild(s);
+            });
+        }
+
+        async function pollAck(nonce) {
+            for (let i = 0; i < 6; i++) {
+                await new Promise(r => setTimeout(r, i === 0 ? 1500 : 1200));
+                try {
+                    const res = await jsonp(SCRIPT_URL + '?action=ack&nonce=' + encodeURIComponent(nonce));
+                    if (res && !res.pending) return res;
+                } catch (e) { /* on réessaie */ }
+            }
+            return null;
+        }
 
         function resetForm() {
             const form = document.getElementById('multiStepForm');
             form.reset();
             form.querySelectorAll('.invalid').forEach(clearError);
+            document.getElementById('consent').checked = false;
+            document.getElementById('confirm').checked = false;
             document.getElementById('motCount').textContent = '0';
             form.classList.remove('hidden');
             document.getElementById('navButtons').classList.remove('hidden');
