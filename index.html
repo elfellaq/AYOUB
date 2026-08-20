@@ -5,14 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نموذج الانخراط - حزب الاستقلال</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: linear-gradient(135deg, #1A1A1A 0%, #2D1F2E 50%, #1A1A1A 100%);
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-family: 'Cairo', sans-serif;
         }
         .bg-animated {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
@@ -352,7 +356,7 @@
                 <p class="text-pink-400 font-bold" id="successContact"></p>
             </div>
             
-            <button onclick="generateDataDrivenPDF()" id="pdfBtn"
+            <button onclick="generateArabicPDF()" id="pdfBtn"
                 class="btn-pdf px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 mx-auto mb-4">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -366,12 +370,40 @@
         </div>
     </main>
 
+    <!-- PDF Template (Hidden - Used for html2canvas) -->
+    <div id="pdfTemplate" style="position: absolute; left: -9999px; top: 0; width: 800px; background: white; color: #1A1A1A; font-family: 'Cairo', sans-serif; direction: rtl; padding: 40px;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #E91E63, #C2185B); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
+            <h1 style="color: white; font-size: 36px; margin-bottom: 10px; font-weight: 800;">حزب الاستقلال</h1>
+            <h2 style="color: #FCE4EC; font-size: 20px; margin-bottom: 5px;">ISTIQLAL PARTY</h2>
+            <p style="color: white; font-size: 18px; margin-top: 15px;">استمارة انخراط الشبيبة الاستقلالية</p>
+            <p style="color: #FCE4EC; font-size: 14px; margin-top: 10px;">Formulaire d'adhésion - Jeunesse Indépendante</p>
+        </div>
+
+        <!-- Date -->
+        <div style="text-align: left; margin-bottom: 20px; color: #666; font-size: 14px;">
+            <strong>تاريخ التسجيل:</strong> <span id="pdfDate"></span>
+        </div>
+
+        <!-- Content -->
+        <div id="pdfContent"></div>
+
+        <!-- Footer -->
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 3px solid #E91E63; text-align: center;">
+            <div style="background: #FCE4EC; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <p style="color: #C2185B; font-weight: bold; font-size: 16px;">✓ تم تأكيد صحة المعلومات والالتزام بقوانين حزب الاستقلال</p>
+            </div>
+            <p style="color: #999; font-size: 12px;">حزب الاستقلال - المغرب | www.istiqlal.ma</p>
+        </div>
+    </div>
+
     <script>
         let currentStep = 1;
         const totalSteps = 5;
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdknPRVpE_TTMG8EVAf49SAGQVz72GbINTKodReAYfe4MGGZl_C1s8I8dF2RL0gjs/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
         let formDataGlobal = {};
 
+        // ===== Multi-Step Logic =====
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
@@ -442,7 +474,8 @@
             `;
         }
 
-        async function generateDataDrivenPDF() {
+        // ===== ARABIC PDF GENERATION (html2canvas + jsPDF) =====
+        async function generateArabicPDF() {
             const btn = document.getElementById('pdfBtn');
             const btnText = document.getElementById('pdfBtnText');
             const originalText = btnText.textContent;
@@ -451,147 +484,95 @@
             btnText.textContent = 'جاري إنشاء PDF...';
             
             try {
-                const { PDFDocument, rgb, StandardFonts } = PDFLib;
-                
-                const pdfDoc = await PDFDocument.create();
-                let page = pdfDoc.addPage([595.28, 841.89]);
-                const { width, height } = page.getSize();
-                
-                const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-                const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-                
-                const pinkColor = rgb(0.914, 0.118, 0.388);
-                const darkPink = rgb(0.761, 0.094, 0.357);
-                const black = rgb(0.1, 0.1, 0.1);
-                const gray = rgb(0.4, 0.4, 0.4);
-                const white = rgb(1, 1, 1);
-                const lightPink = rgb(0.988, 0.894, 0.929);
-                
-                page.drawRectangle({
-                    x: 0, y: height - 120, width: width, height: 120,
-                    color: pinkColor
-                });
-                
-                page.drawText('ISTIQLAL PARTY', {
-                    x: width / 2 - 75, y: height - 55,
-                    size: 20, font: helveticaBold, color: white
-                });
-                
-                page.drawText('Parti de l\'Independance - Maroc', {
-                    x: width / 2 - 110, y: height - 80,
-                    size: 11, font: helveticaFont, color: white
-                });
-                
+                // Set date
                 const now = new Date();
-                const dateStr = now.toLocaleDateString('fr-FR');
-                page.drawText(`Date: ${dateStr}`, {
-                    x: 40, y: height - 145,
-                    size: 10, font: helveticaFont, color: gray
+                const dateStr = now.toLocaleDateString('ar-MA', { 
+                    year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+                document.getElementById('pdfDate').textContent = dateStr;
+                
+                // Build content
+                const content = document.getElementById('pdfContent');
+                content.innerHTML = `
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">📋 المعلومات الشخصية</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>الاسم الكامل:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.fullname || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>تاريخ الازدياد:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.birthdate || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>مكان الازدياد:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.birthplace || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>العنوان:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.address || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>المدينة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.city || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>الجهة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.region || '-'}</td></tr>
+                        </table>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">📞 معلومات الاتصال</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>رقم الهاتف:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.phone || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>البريد الإلكتروني:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.email || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>البريد البديل:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.email2 || '-'}</td></tr>
+                        </table>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;"> المعلومات المهنية والدراسية</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>المستوى الدراسي:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.education || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>التخصص:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.specialty || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>الوضعية المهنية:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.jobStatus || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>المهنة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.profession || '-'}</td></tr>
+                        </table>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">🎯 المعلومات الحزبية</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>الصفة المطلوبة:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.position || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>الدوافع:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.motivation || '-'}</td></tr>
+                            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>المجالات:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.interests || '-'}</td></tr>
+                        </table>
+                    </div>
+                `;
+                
+                // Use html2canvas to convert to image
+                const template = document.getElementById('pdfTemplate');
+                const canvas = await html2canvas(template, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
                 });
                 
-                let yPos = height - 180;
-                const leftMargin = 40;
-                const rightMargin = width - 40;
-                const lineHeight = 20;
+                // Create PDF with jsPDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
                 
-                function checkPageBreak() {
-                    if (yPos < 100) {
-                        page = pdfDoc.addPage([595.28, 841.89]);
-                        yPos = height - 50;
-                    }
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 297; // A4 height in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                // Add more pages if content is long
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
                 }
                 
-                function drawSection(title) {
-                    checkPageBreak();
-                    yPos -= 15;
-                    page.drawLine({
-                        start: { x: leftMargin, y: yPos },
-                        end: { x: rightMargin, y: yPos },
-                        thickness: 2, color: pinkColor
-                    });
-                    yPos -= 28;
-                    page.drawText(title, {
-                        x: leftMargin, y: yPos,
-                        size: 13, font: helveticaBold, color: pinkColor
-                    });
-                    yPos -= 12;
-                }
+                // Save PDF
+                const filename = `انخراط_حزب_الاستقلال_${formDataGlobal.fullname || 'nouveau'}_${Date.now()}.pdf`;
+                pdf.save(filename);
                 
-                function drawField(label, value) {
-                    checkPageBreak();
-                    page.drawText(label + ':', {
-                        x: leftMargin, y: yPos,
-                        size: 10, font: helveticaBold, color: gray
-                    });
-                    const valueText = (value || '-').toString().substring(0, 70);
-                    page.drawText(valueText, {
-                        x: leftMargin + 140, y: yPos,
-                        size: 10, font: helveticaFont, color: black,
-                        maxWidth: 380
-                    });
-                    page.drawLine({
-                        start: { x: leftMargin, y: yPos - 4 },
-                        end: { x: rightMargin, y: yPos - 4 },
-                        thickness: 0.5, color: rgb(0.9, 0.9, 0.9)
-                    });
-                    yPos -= lineHeight;
-                }
-                
-                drawSection('INFORMATIONS PERSONNELLES');
-                drawField('Nom complet', formDataGlobal.fullname);
-                drawField('Date de naissance', formDataGlobal.birthdate);
-                drawField('Lieu de naissance', formDataGlobal.birthplace);
-                drawField('Adresse', formDataGlobal.address);
-                drawField('Ville', formDataGlobal.city);
-                drawField('Region', formDataGlobal.region);
-                
-                drawSection('COORDONNEES');
-                drawField('Telephone', formDataGlobal.phone);
-                drawField('Email', formDataGlobal.email);
-                drawField('Email secondaire', formDataGlobal.email2);
-                
-                drawSection('INFORMATIONS PROFESSIONNELLES');
-                drawField('Niveau d\'etudes', formDataGlobal.education);
-                drawField('Specialite', formDataGlobal.specialty);
-                drawField('Situation professionnelle', formDataGlobal.jobStatus);
-                drawField('Profession', formDataGlobal.profession);
-                
-                drawSection('INFORMATIONS PARTISANES');
-                drawField('Fonction souhaitee', formDataGlobal.position);
-                drawField('Motivation', formDataGlobal.motivation);
-                drawField('Domaines d\'interet', formDataGlobal.interests);
-                
-                checkPageBreak();
-                yPos -= 20;
-                checkPageBreak();
-                
-                page.drawRectangle({
-                    x: leftMargin, y: yPos - 40,
-                    width: width - 80, height: 40,
-                    color: lightPink,
-                    borderColor: pinkColor,
-                    borderWidth: 1
-                });
-                page.drawText('Confirmation des informations et engagement respecte', {
-                    x: leftMargin + 10, y: yPos - 18,
-                    size: 10, font: helveticaBold, color: darkPink
-                });
-                
-                page.drawRectangle({
-                    x: 0, y: 0, width: width, height: 40,
-                    color: pinkColor
-                });
-                page.drawText('ISTIQLAL PARTY - MAROC | www.istiqlal.ma', {
-                    x: width / 2 - 110, y: 15,
-                    size: 9, font: helveticaFont, color: white
-                });
-                
-                const pdfBytes = await pdfDoc.save();
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                const filename = `Adhesion_Istiqlal_${formDataGlobal.fullname || 'nouveau'}_${Date.now()}.pdf`;
-                saveAs(blob, filename);
-                
-                btnText.textContent = '✓ PDF téléchargé avec succès';
+                btnText.textContent = '✓ تم تحميل PDF بنجاح';
                 setTimeout(() => {
                     btnText.textContent = originalText;
                     btn.disabled = false;
@@ -599,12 +580,13 @@
                 
             } catch (error) {
                 console.error('PDF Generation Error:', error);
-                alert('Erreur: ' + error.message);
+                alert('Erreur lors de la génération du PDF: ' + error.message);
                 btnText.textContent = originalText;
                 btn.disabled = false;
             }
         }
 
+        // Form submission to Google Sheets
         document.getElementById('multiStepForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!document.getElementById('confirm').checked) {
@@ -631,7 +613,10 @@
             formDataGlobal = data;
 
             try {
-                if (!SCRIPT_URL.includes('YOUR_SCRIPT_ID')) {
+                if (SCRIPT_URL.includes('YOUR_SCRIPT_ID')) {
+                    console.warn('⚠️ Google Apps Script URL not configured!');
+                    console.log('Data to send:', data);
+                } else {
                     await fetch(SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
