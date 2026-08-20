@@ -59,7 +59,11 @@
             background: rgba(45, 45, 45, 0.9); border-color: #E91E63;
             box-shadow: 0 0 0 4px rgba(233, 30, 99, 0.2); outline: none;
         }
+        .input-field.invalid { border-color: #EF4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,.2); }
+        .field-error { color: #FCA5A5; font-size: 0.78rem; margin-top: 5px; display: none; }
+        .field-error.show { display: block; }
         .input-label { color: #F48FB1; font-weight: 600; }
+        .req::after { content: ' *'; color: #EF4444; }
         .btn-primary {
             background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%);
             transition: all 0.3s ease; width: 100%; white-space: nowrap;
@@ -132,8 +136,6 @@
             display: flex; justify-content: center;
         }
         .g-recaptcha { margin: 20px 0; transform: scale(0.9); transform-origin: center; }
-
-        /* Signature de conception — bas de page */
         .site-credit {
             width: 100%; max-width: 700px; margin: 0 auto 2rem;
             text-align: center; padding: 1rem 0.5rem;
@@ -142,12 +144,10 @@
         .site-credit p:first-child { color: #9CA3AF; font-size: 0.8rem; margin-bottom: 4px; }
         .site-credit p:nth-child(2) { color: #F48FB1; font-size: 0.95rem; font-weight: 700; }
         .site-credit p:last-child { color: #6B7280; font-size: 0.7rem; margin-top: 3px; }
-
         .responsive-title { font-size: clamp(1.15rem, 4vw, 1.75rem); }
         .responsive-subtitle { font-size: clamp(1rem, 3vw, 1.25rem); }
         .responsive-text { font-size: clamp(0.875rem, 2.5vw, 1rem); }
         .no-overflow { overflow-x: hidden; max-width: 100%; }
-
         @media screen and (max-width: 640px) {
             .glass-card { padding: 1.5rem !important; border-radius: 1.5rem !important; }
             .step-indicator { width: 32px; height: 32px; font-size: 12px; }
@@ -170,21 +170,17 @@
 </head>
 <body class="flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 text-white no-overflow">
     <div class="bg-animated"></div>
-
     <main class="w-full max-w-[700px] glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 relative overflow-hidden my-4 sm:my-10">
-
         <div class="party-logo">
             <svg class="scales-icon" viewBox="0 0 24 24">
                 <path d="M12 2C12.55 2 13 2.45 13 3V6H19C19.55 6 20 6.45 20 7C20 7.55 19.55 8 19 8H17V14H20C20.55 14 21 14.45 21 15C21 15.55 20.55 16 20 16H4C3.45 16 3 15.55 3 15C3 14.45 3.45 14 4 14H7V8H5C4.45 8 4 7.55 4 7C4 6.45 4.45 6 5 6H11V3C11 2.45 11.45 2 12 2M7 8V14H17V8H7M9 18H11V22H9V18M13 18H15V22H13V18Z"/>
             </svg>
         </div>
-
         <div class="text-center mb-6 sm:mb-8">
             <h1 class="responsive-title font-bold mb-2 text-pink-400 leading-tight">منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</h1>
             <p class="responsive-subtitle text-pink-300 font-bold mb-1">ISTIQLAL PARTY</p>
             <p class="responsive-text text-gray-400">نموذج انخراط الشبيبة الاستقلالية</p>
         </div>
-
         <div class="mb-6 sm:mb-8">
             <div class="progress-bar mb-3"><div class="progress-fill" id="progressBar" style="width: 20%"></div></div>
             <div class="flex justify-between items-center gap-1 sm:gap-2">
@@ -204,7 +200,6 @@
         </div>
 
         <form id="multiStepForm" novalidate>
-
             <div class="step-content active" data-step="1">
                 <h2 class="text-xl sm:text-2xl font-bold text-pink-300 mb-4 sm:mb-6 flex items-center gap-2 flex-wrap">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm flex-shrink-0">1</span>
@@ -212,17 +207,20 @@
                 </h2>
                 <div class="space-y-3 sm:space-y-4">
                     <div>
-                        <label class="input-label block text-sm mb-2">الاسم الكامل</label>
-                        <input type="text" id="fullname" name="fullname" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="أدخل اسمك الكامل">
+                        <label class="input-label req block text-sm mb-2">الاسم الكامل</label>
+                        <input type="text" id="fullname" name="fullname" required class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="أدخل اسمك الكامل">
+                        <p class="field-error"></p>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                            <label class="input-label block text-sm mb-2">تاريخ الازدياد</label>
-                            <input type="date" id="birthdate" name="birthdate" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3">
+                            <label class="input-label req block text-sm mb-2">تاريخ الازدياد</label>
+                            <input type="date" id="birthdate" name="birthdate" required class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3">
+                            <p class="field-error"></p>
                         </div>
                         <div>
-                            <label class="input-label block text-sm mb-2">مكان الازدياد</label>
-                            <input type="text" id="birthplace" name="birthplace" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="المدينة">
+                            <label class="input-label req block text-sm mb-2">مكان الازدياد</label>
+                            <input type="text" id="birthplace" name="birthplace" required class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="المدينة">
+                            <p class="field-error"></p>
                         </div>
                     </div>
                     <div>
@@ -231,12 +229,13 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                            <label class="input-label block text-sm mb-2">المدينة</label>
-                            <input type="text" id="city" name="city" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="المدينة">
+                            <label class="input-label req block text-sm mb-2">المدينة</label>
+                            <input type="text" id="city" name="city" required class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="المدينة">
+                            <p class="field-error"></p>
                         </div>
                         <div>
                             <label class="input-label block text-sm mb-2">الجهة</label>
-                            <input type="text" id="region" name="region" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="الجهة">
+                            <input type="text" id="region" name="region" value="الداخلة وادي الذهب" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="الجهة">
                         </div>
                     </div>
                 </div>
@@ -249,17 +248,19 @@
                 </h2>
                 <div class="space-y-3 sm:space-y-4">
                     <div>
-                        <label class="input-label block text-sm mb-2">رقم الهاتف</label>
-                        <input type="tel" id="phone" name="phone" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="06XXXXXXXX">
+                        <label class="input-label req block text-sm mb-2">رقم الهاتف</label>
+                        <input type="tel" id="phone" name="phone" required inputmode="numeric" maxlength="10" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="06XXXXXXXX">
+                        <p class="field-error"></p>
                     </div>
                     <div>
                         <label class="input-label block text-sm mb-2">البريد الإلكتروني</label>
                         <input type="email" id="email" name="email" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="exemple@email.com">
+                        <p class="field-error"></p>
                     </div>
-                    <!-- CORRIGÉ : le champ était type="email" / name="email2" alors que le libellé demande la CIN -->
                     <div>
-                        <label class="input-label block text-sm mb-2">رقم البطاقة الوطنية</label>
-                        <input type="text" id="cin" name="cin" inputmode="text" autocomplete="off" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="مثال: JB123456">
+                        <label class="input-label req block text-sm mb-2">رقم البطاقة الوطنية</label>
+                        <input type="text" id="cin" name="cin" required autocomplete="off" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="مثال: JB123456">
+                        <p class="field-error"></p>
                     </div>
                 </div>
             </div>
@@ -271,29 +272,33 @@
                 </h2>
                 <div class="space-y-3 sm:space-y-4">
                     <div>
-                        <label class="input-label block text-sm mb-2">المستوى الدراسي</label>
-                        <select id="education" name="education" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3">
+                        <label class="input-label req block text-sm mb-2">المستوى الدراسي</label>
+                        <select id="education" name="education" required class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3">
                             <option value="" class="bg-gray-800">اختر المستوى...</option>
                             <option value="college" class="bg-gray-800">إعدادي</option>
                             <option value="lycee" class="bg-gray-800">ثانوي</option>
+                            <option value="bac" class="bg-gray-800">باكالوريا</option>
+                            <option value="bac2" class="bg-gray-800">باك + 2</option>
                             <option value="licence" class="bg-gray-800">إجازة</option>
                             <option value="master" class="bg-gray-800">ماستر</option>
                             <option value="doctorat" class="bg-gray-800">دكتوراه</option>
                         </select>
+                        <p class="field-error"></p>
                     </div>
                     <div>
                         <label class="input-label block text-sm mb-2">التخصص</label>
                         <input type="text" id="specialty" name="specialty" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="التخصص">
                     </div>
                     <div>
-                        <label class="input-label block text-sm mb-2">الوضعية المهنية</label>
-                        <select id="jobStatus" name="jobStatus" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3">
+                        <label class="input-label req block text-sm mb-2">الوضعية المهنية</label>
+                        <select id="jobStatus" name="jobStatus" required class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3">
                             <option value="" class="bg-gray-800">اختر الوضعية...</option>
                             <option value="student" class="bg-gray-800">طالب/ة</option>
                             <option value="employee" class="bg-gray-800">موظف/ة</option>
                             <option value="self-employed" class="bg-gray-800">عامل/ة حر/ة</option>
                             <option value="unemployed" class="bg-gray-800">باحث/ة عن عمل</option>
                         </select>
+                        <p class="field-error"></p>
                     </div>
                     <div>
                         <label class="input-label block text-sm mb-2">المهنة</label>
@@ -309,18 +314,19 @@
                 </h2>
                 <div class="space-y-3 sm:space-y-4">
                     <div>
-                        <label class="input-label block text-sm mb-2">الصفة المطلوبة</label>
-                        <select id="position" name="position" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3">
+                        <label class="input-label req block text-sm mb-2">الصفة المطلوبة</label>
+                        <select id="position" name="position" required class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3">
                             <option value="" class="bg-gray-800">اختر الصفة...</option>
-                            <option value="membre" class="bg-gray-800">عضو بسيط</option>
-                            <option value="responsable" class="bg-gray-800">مسؤول محلي</option>
-                            <option value="coordinateur" class="bg-gray-800">منسق</option>
+                            <option value="membre" class="bg-gray-800">عضو</option>
                             <option value="animateur" class="bg-gray-800">منشط</option>
+                            <option value="coordinateur" class="bg-gray-800">منسق</option>
                         </select>
+                        <p class="field-error"></p>
                     </div>
                     <div>
                         <label class="input-label block text-sm mb-2">لماذا تريد الانخراط؟</label>
-                        <textarea id="motivation" name="motivation" rows="4" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="اشرح دوافعك..."></textarea>
+                        <textarea id="motivation" name="motivation" rows="4" maxlength="400" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="اشرح دوافعك..."></textarea>
+                        <p class="text-xs text-gray-500 mt-1"><span id="motCount">0</span>/400</p>
                     </div>
                     <div>
                         <label class="input-label block text-sm mb-2">المجالات التي تهتم بها</label>
@@ -380,12 +386,8 @@
             </div>
 
             <div id="navButtons" class="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-700">
-                <button type="button" id="prevBtn" onclick="changeStep(-1)" class="btn-secondary py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-bold hidden">
-                    السابق
-                </button>
-                <button type="button" id="nextBtn" onclick="changeStep(1)" class="btn-primary py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-bold">
-                    التالي
-                </button>
+                <button type="button" id="prevBtn" onclick="changeStep(-1)" class="btn-secondary py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-bold hidden">السابق</button>
+                <button type="button" id="nextBtn" onclick="changeStep(1)" class="btn-primary py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-bold">التالي</button>
                 <button type="submit" id="submitBtn" class="btn-primary py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl font-bold hidden">
                     <span class="spinner" id="spinner"></span>
                     <span id="btnText">تأكيد الانخراط</span>
@@ -419,20 +421,24 @@
         const totalSteps = 5;
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztMKRcMm764mP3Ryk7o7n1_8-hgV_VJQ4gcPll5e7QTYLP7hHmqGxye2RL5czV6T5e/exec';
 
+        // Libellés arabes (mêmes clés que la page admin)
+        const MAP_EDU = { college:'إعدادي', lycee:'ثانوي', bac:'باكالوريا', bac2:'باك + 2', licence:'إجازة', master:'ماستر', doctorat:'دكتوراه' };
+        const MAP_JOB = { student:'طالب/ة', employee:'موظف/ة', 'self-employed':'عامل/ة حر/ة', unemployed:'باحث/ة عن عمل' };
+        const MAP_POS = { membre:'عضو', animateur:'منشط', coordinateur:'منسق' };
+        const MAP_INT = { social:'الشأن الاجتماعي', economic:'الشأن الاقتصادي', cultural:'الشأن الثقافي', youth:'شؤون الشباب' };
+
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const lbl = (map, v) => map[String(v || '').trim()] || (String(v || '').trim() || '-');
+        const lblList = (map, v) => String(v || '').split(',').map(s => s.trim()).filter(Boolean).map(s => map[s] || s).join('، ') || '-';
+
         function updateProgress() {
             document.getElementById('progressBar').style.width = ((currentStep / totalSteps) * 100) + '%';
             document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
                 const stepNum = index + 1;
                 indicator.classList.remove('active', 'completed');
-                if (stepNum === currentStep) {
-                    indicator.classList.add('active');
-                    indicator.innerHTML = stepNum;
-                } else if (stepNum < currentStep) {
-                    indicator.classList.add('completed');
-                    indicator.innerHTML = '✓';
-                } else {
-                    indicator.innerHTML = stepNum;
-                }
+                if (stepNum === currentStep) { indicator.classList.add('active'); indicator.innerHTML = stepNum; }
+                else if (stepNum < currentStep) { indicator.classList.add('completed'); indicator.innerHTML = '✓'; }
+                else { indicator.innerHTML = stepNum; }
             });
         }
 
@@ -453,43 +459,117 @@
             document.getElementById('submitBtn').classList.toggle('hidden', currentStep !== totalSteps);
         }
 
-        function validateStep(step) {
-            let isValid = true;
-            const stepContent = document.querySelector('.step-content[data-step="' + step + '"]');
-            stepContent.querySelectorAll('input[required], select[required], textarea[required]').forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('border-red-500');
-                    setTimeout(() => input.classList.remove('border-red-500'), 2000);
-                }
-            });
-            if (!isValid) alert('يرجى ملء جميع الحقول المطلوبة');
-            return isValid;
+        // ---- Validation ----
+        function showError(el, msg) {
+            el.classList.add('invalid');
+            const p = el.parentElement.querySelector('.field-error');
+            if (p) { p.textContent = msg; p.classList.add('show'); }
+        }
+        function clearError(el) {
+            el.classList.remove('invalid');
+            const p = el.parentElement.querySelector('.field-error');
+            if (p) p.classList.remove('show');
         }
 
-        function esc(s) {
-            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const RE_PHONE = /^0[5-7][0-9]{8}$/;
+        const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        const RE_CIN   = /^[A-Za-z]{1,2}[0-9]{4,8}$/;
+
+        function validateStep(step) {
+            const stepContent = document.querySelector('.step-content[data-step="' + step + '"]');
+            let firstBad = null;
+
+            stepContent.querySelectorAll('input, select, textarea').forEach(el => {
+                clearError(el);
+                const v = (el.value || '').trim();
+
+                if (el.hasAttribute('required') && !v) {
+                    showError(el, 'هذا الحقل إجباري');
+                    if (!firstBad) firstBad = el;
+                    return;
+                }
+                if (el.id === 'phone' && v && !RE_PHONE.test(v)) {
+                    showError(el, 'رقم غير صحيح — 10 أرقام تبدأ بـ 06 أو 07 أو 05');
+                    if (!firstBad) firstBad = el;
+                }
+                if (el.id === 'email' && v && !RE_EMAIL.test(v)) {
+                    showError(el, 'البريد الإلكتروني غير صحيح');
+                    if (!firstBad) firstBad = el;
+                }
+                if (el.id === 'cin' && v && !RE_CIN.test(v)) {
+                    showError(el, 'رقم البطاقة غير صحيح — مثال: JB123456');
+                    if (!firstBad) firstBad = el;
+                }
+                if (el.id === 'birthdate' && v) {
+                    const age = (Date.now() - new Date(v).getTime()) / 31557600000;
+                    if (age < 15 || age > 100) {
+                        showError(el, 'تاريخ الازدياد غير صحيح');
+                        if (!firstBad) firstBad = el;
+                    }
+                }
+            });
+
+            if (firstBad) {
+                firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstBad.focus({ preventScroll: true });
+                return false;
+            }
+            return true;
         }
+
+        // Nettoie l'erreur dès que l'utilisateur corrige
+        document.getElementById('multiStepForm').addEventListener('input', e => {
+            if (e.target.classList.contains('invalid')) clearError(e.target);
+        });
+
+        // Le téléphone n'accepte que des chiffres
+        document.getElementById('phone').addEventListener('input', e => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+        });
+        document.getElementById('cin').addEventListener('input', e => {
+            e.target.value = e.target.value.toUpperCase().replace(/\s/g, '');
+        });
+        document.getElementById('motivation').addEventListener('input', e => {
+            document.getElementById('motCount').textContent = e.target.value.length;
+        });
 
         function populateReview() {
             const data = Object.fromEntries(new FormData(document.getElementById('multiStepForm')));
-            const item = (label, val) =>
-                '<div class="review-item"><span class="text-gray-400 text-sm">' + label + '</span><p class="font-semibold">' + esc(val || '-') + '</p></div>';
+            const interests = [];
+            document.querySelectorAll('input[name="interests"]:checked').forEach(cb => interests.push(cb.value));
+            const item = (label, v) =>
+                '<div class="review-item"><span class="text-gray-400 text-sm">' + label + '</span><p class="font-semibold">' + esc(v || '-') + '</p></div>';
+
             document.getElementById('review-personal').innerHTML =
-                item('الاسم الكامل:', data.fullname) + item('تاريخ الازدياد:', data.birthdate) + item('المدينة:', data.city);
+                item('الاسم الكامل:', data.fullname) + item('تاريخ الازدياد:', data.birthdate) +
+                item('مكان الازدياد:', data.birthplace) + item('المدينة:', data.city);
             document.getElementById('review-contact').innerHTML =
                 item('الهاتف:', data.phone) + item('البريد الإلكتروني:', data.email) + item('البطاقة الوطنية:', data.cin);
             document.getElementById('review-professional').innerHTML =
-                item('المستوى الدراسي:', data.education) + item('الوضعية المهنية:', data.jobStatus);
-            document.getElementById('review-party').innerHTML = item('الصفة:', data.position);
+                item('المستوى الدراسي:', lbl(MAP_EDU, data.education)) + item('التخصص:', data.specialty) +
+                item('الوضعية المهنية:', lbl(MAP_JOB, data.jobStatus)) + item('المهنة:', data.profession);
+            document.getElementById('review-party').innerHTML =
+                item('الصفة:', lbl(MAP_POS, data.position)) +
+                item('المجالات:', lblList(MAP_INT, interests.join(',')));
         }
 
         document.getElementById('multiStepForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const recaptchaResponse = grecaptcha.getResponse();
-            if (recaptchaResponse.length === 0) {
+
+            // Revalide toutes les étapes avant d'envoyer
+            for (let s = 1; s <= 4; s++) {
+                if (!validateStep(s)) {
+                    document.querySelector('.step-content[data-step="' + currentStep + '"]').classList.remove('active');
+                    currentStep = s;
+                    document.querySelector('.step-content[data-step="' + s + '"]').classList.add('active');
+                    updateButtons(); updateProgress();
+                    return;
+                }
+            }
+
+            const recaptchaResponse = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse() : '';
+            if (!recaptchaResponse) {
                 document.getElementById('captchaError').classList.remove('hidden');
-                alert('يرجى إتمام التحقق من reCAPTCHA');
                 return;
             }
             document.getElementById('captchaError').classList.add('hidden');
@@ -507,6 +587,7 @@
             btnText.textContent = 'جاري الإرسال...';
 
             const data = Object.fromEntries(new FormData(e.target));
+            delete data.confirm;
             data.recaptcha = recaptchaResponse;
             const interests = [];
             document.querySelectorAll('input[name="interests"]:checked').forEach(cb => interests.push(cb.value));
@@ -522,7 +603,8 @@
                 document.getElementById('multiStepForm').classList.add('hidden');
                 document.getElementById('navButtons').classList.add('hidden');
                 document.getElementById('successMessage').classList.remove('hidden');
-                document.getElementById('successContact').textContent = data.phone + ' - ' + data.email;
+                document.getElementById('successContact').textContent = data.phone + (data.email ? ' - ' + data.email : '');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (error) {
                 console.error('Submission Error:', error);
                 alert('حدث خطأ أثناء الإرسال.');
@@ -536,6 +618,8 @@
         function resetForm() {
             const form = document.getElementById('multiStepForm');
             form.reset();
+            form.querySelectorAll('.invalid').forEach(clearError);
+            document.getElementById('motCount').textContent = '0';
             form.classList.remove('hidden');
             document.getElementById('navButtons').classList.remove('hidden');
             document.getElementById('successMessage').classList.add('hidden');
