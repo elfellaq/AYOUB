@@ -5,24 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نموذج الانخراط - حزب الاستقلال</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- pdf-lib library -->
+    <!-- PDF Libraries -->
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <!-- Arabic text shaping library -->
-    <script src="https://cdn.jsdelivr.net/npm/arabic-presenter@1.0.3/dist/arabic-presenter.min.js"></script>
+    <script src="https://unpkg.com/fontkit@1.0.0/dist/fontkit.umd.min.js"></script>
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
                     colors: {
-                        istiqlal: {
-                            pink: '#E91E63', pinkDark: '#C2185B', pinkLight: '#F48FB1',
-                            black: '#1A1A1A', gray: '#2D2D2D'
-                        }
+                        istiqlal: { pink: '#E91E63', pinkDark: '#C2185B' }
                     }
                 }
             }
@@ -34,7 +28,7 @@
         body {
             background: linear-gradient(135deg, #1A1A1A 0%, #2D1F2E 50%, #1A1A1A 100%);
             min-height: 100vh;
-            font-family: 'Cairo', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .bg-animated {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
@@ -68,6 +62,7 @@
             background: rgba(45, 45, 45, 0.7);
             border: 2px solid rgba(233, 30, 99, 0.3);
             transition: all 0.3s ease;
+            color: white;
         }
         .input-field:focus {
             background: rgba(45, 45, 45, 0.9);
@@ -91,7 +86,7 @@
         .progress-bar { background: rgba(45, 45, 45, 0.8); border-radius: 9999px; overflow: hidden; height: 8px; }
         .progress-fill {
             background: linear-gradient(90deg, #E91E63, #F48FB1); height: 100%;
-            transition: width 0.5s ease; box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
+            transition: width 0.5s ease;
         }
         .step-indicator {
             width: 40px; height: 40px; border-radius: 50%;
@@ -159,7 +154,7 @@
         </div>
 
         <div class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold mb-2 bg-gradient-to-r from-pink-400 via-pink-300 to-pink-400 bg-clip-text text-transparent">حزب الاستقلال</h1>
+            <h1 class="text-3xl sm:text-4xl font-bold mb-2 text-pink-400">حزب الاستقلال</h1>
             <p class="text-pink-300 text-lg font-bold mb-1">ISTIQLAL PARTY</p>
             <p class="text-gray-400 text-sm">نموذج انخراط الشبيبة الاستقلالية</p>
         </div>
@@ -184,35 +179,34 @@
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm">1</span>
                     المعلومات الشخصية
-                    <span class="text-sm text-gray-500 mr-auto">(Informations personnelles)</span>
                 </h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="input-label block text-sm mb-2">الاسم الكامل <span class="text-gray-500 text-xs">(Nom Complet)</span></label>
-                        <input type="text" id="fullname" name="fullname" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="أدخل اسمك الكامل">
+                        <label class="input-label block text-sm mb-2">الاسم الكامل</label>
+                        <input type="text" id="fullname" name="fullname" class="input-field w-full rounded-xl px-4 py-3" placeholder="أدخل اسمك الكامل">
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="input-label block text-sm mb-2">تاريخ الازدياد <span class="text-gray-500 text-xs">(Date de naissance)</span></label>
-                            <input type="date" id="birthdate" name="birthdate" class="input-field w-full rounded-xl px-4 py-3 text-white">
+                            <label class="input-label block text-sm mb-2">تاريخ الازدياد</label>
+                            <input type="date" id="birthdate" name="birthdate" class="input-field w-full rounded-xl px-4 py-3">
                         </div>
                         <div>
-                            <label class="input-label block text-sm mb-2">مكان الازدياد <span class="text-gray-500 text-xs">(Lieu de naissance)</span></label>
-                            <input type="text" id="birthplace" name="birthplace" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="المدينة">
+                            <label class="input-label block text-sm mb-2">مكان الازدياد</label>
+                            <input type="text" id="birthplace" name="birthplace" class="input-field w-full rounded-xl px-4 py-3" placeholder="المدينة">
                         </div>
                     </div>
                     <div>
-                        <label class="input-label block text-sm mb-2">العنوان الكامل <span class="text-gray-500 text-xs">(Adresse)</span></label>
-                        <textarea id="address" name="address" rows="3" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="العنوان الكامل"></textarea>
+                        <label class="input-label block text-sm mb-2">العنوان الكامل</label>
+                        <textarea id="address" name="address" rows="3" class="input-field w-full rounded-xl px-4 py-3" placeholder="العنوان الكامل"></textarea>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="input-label block text-sm mb-2">المدينة <span class="text-gray-500 text-xs">(Ville)</span></label>
-                            <input type="text" id="city" name="city" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="المدينة">
+                            <label class="input-label block text-sm mb-2">المدينة</label>
+                            <input type="text" id="city" name="city" class="input-field w-full rounded-xl px-4 py-3" placeholder="المدينة">
                         </div>
                         <div>
-                            <label class="input-label block text-sm mb-2">الجهة <span class="text-gray-500 text-xs">(Région)</span></label>
-                            <input type="text" id="region" name="region" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="الجهة">
+                            <label class="input-label block text-sm mb-2">الجهة</label>
+                            <input type="text" id="region" name="region" class="input-field w-full rounded-xl px-4 py-3" placeholder="الجهة">
                         </div>
                     </div>
                 </div>
@@ -222,24 +216,19 @@
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm">2</span>
                     معلومات الاتصال
-                    <span class="text-sm text-gray-500 mr-auto">(Coordonnées)</span>
                 </h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="input-label block text-sm mb-2">رقم الهاتف <span class="text-gray-500 text-xs">(Téléphone)</span></label>
-                        <input type="tel" id="phone" name="phone" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="06XXXXXXXX">
+                        <label class="input-label block text-sm mb-2">رقم الهاتف</label>
+                        <input type="tel" id="phone" name="phone" class="input-field w-full rounded-xl px-4 py-3" placeholder="06XXXXXXXX">
                     </div>
                     <div>
-                        <label class="input-label block text-sm mb-2">البريد الإلكتروني <span class="text-gray-500 text-xs">(E-mail)</span></label>
-                        <input type="email" id="email" name="email" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="exemple@email.com">
+                        <label class="input-label block text-sm mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="email" name="email" class="input-field w-full rounded-xl px-4 py-3" placeholder="exemple@email.com">
                     </div>
                     <div>
-                        <label class="input-label block text-sm mb-2">البريد البديل <span class="text-gray-500 text-xs">(E-mail secondaire)</span></label>
-                        <input type="email" id="email2" name="email2" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="اختياري">
-                    </div>
-                    <div>
-                        <label class="input-label block text-sm mb-2">حساب فيسبوك <span class="text-gray-500 text-xs">(Facebook)</span></label>
-                        <input type="text" id="facebook" name="facebook" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="رابط حساب فيسبوك">
+                        <label class="input-label block text-sm mb-2">البريد البديل</label>
+                        <input type="email" id="email2" name="email2" class="input-field w-full rounded-xl px-4 py-3" placeholder="اختياري">
                     </div>
                 </div>
             </div>
@@ -248,39 +237,36 @@
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm">3</span>
                     المعلومات المهنية والدراسية
-                    <span class="text-sm text-gray-500 mr-auto">(Professionnel & Études)</span>
                 </h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="input-label block text-sm mb-2">المستوى الدراسي <span class="text-gray-500 text-xs">(Niveau d'études)</span></label>
-                        <select id="education" name="education" class="input-field w-full rounded-xl px-4 py-3 text-white bg-transparent">
+                        <label class="input-label block text-sm mb-2">المستوى الدراسي</label>
+                        <select id="education" name="education" class="input-field w-full rounded-xl px-4 py-3">
                             <option value="" class="bg-gray-800">اختر المستوى...</option>
                             <option value="college" class="bg-gray-800">إعدادي</option>
                             <option value="lycee" class="bg-gray-800">ثانوي</option>
                             <option value="licence" class="bg-gray-800">إجازة</option>
                             <option value="master" class="bg-gray-800">ماستر</option>
                             <option value="doctorat" class="bg-gray-800">دكتوراه</option>
-                            <option value="autre" class="bg-gray-800">أخرى</option>
                         </select>
                     </div>
                     <div>
-                        <label class="input-label block text-sm mb-2">التخصص <span class="text-gray-500 text-xs">(Spécialité)</span></label>
-                        <input type="text" id="specialty" name="specialty" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="التخصص">
+                        <label class="input-label block text-sm mb-2">التخصص</label>
+                        <input type="text" id="specialty" name="specialty" class="input-field w-full rounded-xl px-4 py-3" placeholder="التخصص">
                     </div>
                     <div>
-                        <label class="input-label block text-sm mb-2">الوضعية المهنية <span class="text-gray-500 text-xs">(Situation professionnelle)</span></label>
-                        <select id="jobStatus" name="jobStatus" class="input-field w-full rounded-xl px-4 py-3 text-white bg-transparent">
+                        <label class="input-label block text-sm mb-2">الوضعية المهنية</label>
+                        <select id="jobStatus" name="jobStatus" class="input-field w-full rounded-xl px-4 py-3">
                             <option value="" class="bg-gray-800">اختر الوضعية...</option>
                             <option value="student" class="bg-gray-800">طالب/ة</option>
                             <option value="employee" class="bg-gray-800">موظف/ة</option>
                             <option value="self-employed" class="bg-gray-800">عامل/ة حر/ة</option>
                             <option value="unemployed" class="bg-gray-800">باحث/ة عن عمل</option>
-                            <option value="other" class="bg-gray-800">أخرى</option>
                         </select>
                     </div>
                     <div>
-                        <label class="input-label block text-sm mb-2">المهنة <span class="text-gray-500 text-xs">(Profession)</span></label>
-                        <input type="text" id="profession" name="profession" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="المهنة الحالية">
+                        <label class="input-label block text-sm mb-2">المهنة</label>
+                        <input type="text" id="profession" name="profession" class="input-field w-full rounded-xl px-4 py-3" placeholder="المهنة الحالية">
                     </div>
                 </div>
             </div>
@@ -289,50 +275,40 @@
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm">4</span>
                     المعلومات الحزبية
-                    <span class="text-sm text-gray-500 mr-auto">(Informations partisanes)</span>
                 </h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="input-label block text-sm mb-2">الصفة المطلوبة <span class="text-gray-500 text-xs">(Fonction)</span></label>
-                        <select id="position" name="position" class="input-field w-full rounded-xl px-4 py-3 text-white bg-transparent">
+                        <label class="input-label block text-sm mb-2">الصفة المطلوبة</label>
+                        <select id="position" name="position" class="input-field w-full rounded-xl px-4 py-3">
                             <option value="" class="bg-gray-800">اختر الصفة...</option>
                             <option value="membre" class="bg-gray-800">عضو بسيط</option>
                             <option value="responsable" class="bg-gray-800">مسؤول محلي</option>
                             <option value="coordinateur" class="bg-gray-800">منسق</option>
                             <option value="animateur" class="bg-gray-800">منشط</option>
-                            <option value="autre" class="bg-gray-800">أخرى</option>
                         </select>
                     </div>
                     <div>
-                        <label class="input-label block text-sm mb-2">لماذا تريد الانخراط؟ <span class="text-gray-500 text-xs">(Motivation)</span></label>
-                        <textarea id="motivation" name="motivation" rows="4" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="اشرح دوافعك..."></textarea>
+                        <label class="input-label block text-sm mb-2">لماذا تريد الانخراط؟</label>
+                        <textarea id="motivation" name="motivation" rows="4" class="input-field w-full rounded-xl px-4 py-3" placeholder="اشرح دوافعك..."></textarea>
                     </div>
                     <div>
-                        <label class="input-label block text-sm mb-2">المجالات التي تهتم بها <span class="text-gray-500 text-xs">(Domaines d'intérêt)</span></label>
+                        <label class="input-label block text-sm mb-2">المجالات التي تهتم بها</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="social" class="w-5 h-5 rounded border-pink-500 text-pink-600">
+                            <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer">
+                                <input type="checkbox" name="interests" value="social" class="w-5 h-5 rounded border-pink-500">
                                 <span class="text-sm">الشأن الاجتماعي</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="economic" class="w-5 h-5 rounded border-pink-500 text-pink-600">
+                            <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer">
+                                <input type="checkbox" name="interests" value="economic" class="w-5 h-5 rounded border-pink-500">
                                 <span class="text-sm">الشأن الاقتصادي</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="cultural" class="w-5 h-5 rounded border-pink-500 text-pink-600">
+                            <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer">
+                                <input type="checkbox" name="interests" value="cultural" class="w-5 h-5 rounded border-pink-500">
                                 <span class="text-sm">الشأن الثقافي</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="environmental" class="w-5 h-5 rounded border-pink-500 text-pink-600">
-                                <span class="text-sm">الشأن البيئي</span>
-                            </label>
-                            <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="youth" class="w-5 h-5 rounded border-pink-500 text-pink-600">
+                            <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer">
+                                <input type="checkbox" name="interests" value="youth" class="w-5 h-5 rounded border-pink-500">
                                 <span class="text-sm">شؤون الشباب</span>
-                            </label>
-                            <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="education" class="w-5 h-5 rounded border-pink-500 text-pink-600">
-                                <span class="text-sm">التعليم والتكوين</span>
                             </label>
                         </div>
                     </div>
@@ -343,7 +319,6 @@
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm">5</span>
                     المراجعة والتأكيد
-                    <span class="text-sm text-gray-500 mr-auto">(Révision)</span>
                 </h2>
                 <div class="bg-gray-800/30 rounded-xl p-4 mb-4">
                     <h3 class="text-lg font-bold text-pink-400 mb-3">المعلومات الشخصية</h3>
@@ -362,24 +337,23 @@
                     <div id="review-party" class="space-y-2"></div>
                 </div>
                 <div class="flex items-start gap-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-                    <input type="checkbox" id="confirm" name="confirm" required class="w-5 h-5 mt-1 rounded border-yellow-500 text-yellow-600">
+                    <input type="checkbox" id="confirm" name="confirm" required class="w-5 h-5 mt-1 rounded border-yellow-500">
                     <label for="confirm" class="text-sm text-yellow-200">
                         أؤكد صحة المعلومات وألتزم بقوانين حزب الاستقلال
-                        <span class="block text-xs text-gray-400 mt-1">Je certifie l'exactitude des informations</span>
                     </label>
                 </div>
             </div>
 
             <div class="flex gap-4 mt-8 pt-6 border-t border-gray-700">
                 <button type="button" id="prevBtn" onclick="changeStep(-1)" class="btn-secondary flex-1 py-3 px-6 rounded-xl font-bold hidden">
-                    السابق <span class="block text-xs opacity-80">Précédent</span>
+                    السابق
                 </button>
                 <button type="button" id="nextBtn" onclick="changeStep(1)" class="btn-primary flex-1 py-3 px-6 rounded-xl font-bold">
-                    التالي <span class="block text-xs opacity-80">Suivant</span>
+                    التالي
                 </button>
                 <button type="submit" id="submitBtn" class="btn-primary flex-1 py-3 px-6 rounded-xl font-bold hidden">
                     <span class="spinner" id="spinner"></span>
-                    <span id="btnText">تأكيد الانخراط <span class="block text-xs opacity-80">Confirmer</span></span>
+                    <span id="btnText">تأكيد الانخراط</span>
                 </button>
             </div>
         </form>
@@ -389,7 +363,7 @@
             <h2 class="text-3xl font-bold text-emerald-400 mb-3">تم التسجيل بنجاح!</h2>
             <p class="text-gray-300 mb-2 text-lg">شكرا لانضمامك لحزب الاستقلال</p>
             <p class="text-pink-300 text-sm mb-6">Inscription réussie avec succès</p>
-            <div class="bg-gray-800/50 rounded-xl p-4 mb-6 text-right">
+            <div class="bg-gray-800/50 rounded-xl p-4 mb-6">
                 <p class="text-sm text-gray-400 mb-2">سيتم التواصل معك على:</p>
                 <p class="text-pink-400 font-bold" id="successContact"></p>
             </div>
@@ -411,7 +385,8 @@
     <script>
         let currentStep = 1;
         const totalSteps = 5;
-        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+        // ⚠️ IMPORTANT: Replace with your actual Google Apps Script URL
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
         let formDataGlobal = {};
 
         // ===== Multi-Step Logic =====
@@ -485,7 +460,7 @@
             `;
         }
 
-        // ===== DATA-DRIVEN PDF GENERATION (FIXED) =====
+        // ===== PDF GENERATION (Using Standard Fonts Only) =====
         async function generateDataDrivenPDF() {
             const btn = document.getElementById('pdfBtn');
             const btnText = document.getElementById('pdfBtnText');
@@ -497,13 +472,15 @@
             try {
                 const { PDFDocument, rgb, StandardFonts } = PDFLib;
                 
+                // Register fontkit
+                PDFLib.PDFDocument.prototype.context.registerFontkit(fontkit);
+                
                 // Create PDF
                 const pdfDoc = await PDFDocument.create();
-                const page = pdfDoc.addPage([595.28, 841.89]); // A4
+                let page = pdfDoc.addPage([595.28, 841.89]); // A4
                 const { width, height } = page.getSize();
                 
-                // Load font - Use built-in Helvetica for now (no Arabic support but won't crash)
-                // For proper Arabic, you need to embed a font with Arabic glyphs
+                // Use standard fonts (no Arabic support but works reliably)
                 const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
                 const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
                 
@@ -515,22 +492,6 @@
                 const white = rgb(1, 1, 1);
                 const lightPink = rgb(0.988, 0.894, 0.929);
                 
-                // Helper to draw text with RTL support (manual positioning)
-                function drawRTLText(text, x, y, size, font, color, maxWidth = 500) {
-                    if (!text) text = '-';
-                    // Simple RTL: just draw from right to left
-                    const textWidth = font.widthOfTextAtSize(text, size);
-                    const startX = Math.min(x, width - 40 - textWidth);
-                    page.drawText(text, {
-                        x: startX,
-                        y: y,
-                        size: size,
-                        font: font,
-                        color: color,
-                        maxWidth: maxWidth
-                    });
-                }
-                
                 // HEADER
                 page.drawRectangle({
                     x: 0, y: height - 120, width: width, height: 120,
@@ -539,11 +500,11 @@
                 
                 page.drawText('ISTIQLAL PARTY', {
                     x: width / 2 - 70, y: height - 55,
-                    size: 16, font: helveticaBold, color: white
+                    size: 18, font: helveticaBold, color: white
                 });
                 
-                page.drawText('Parti de l\'Independence', {
-                    x: width / 2 - 85, y: height - 75,
+                page.drawText('Parti de l\'Independence - Morocco', {
+                    x: width / 2 - 100, y: height - 75,
                     size: 10, font: helveticaFont, color: white
                 });
                 
@@ -562,6 +523,10 @@
                 
                 function drawSection(title) {
                     yPos -= 15;
+                    if (yPos < 100) {
+                        page = pdfDoc.addPage([595.28, 841.89]);
+                        yPos = height - 50;
+                    }
                     page.drawLine({
                         start: { x: leftMargin, y: yPos },
                         end: { x: rightMargin, y: yPos },
@@ -585,7 +550,7 @@
                         size: 9, font: helveticaFont, color: gray
                     });
                     const valueText = value || '-';
-                    page.drawText(valueText, {
+                    page.drawText(valueText.substring(0, 60), {
                         x: leftMargin + 120, y: yPos,
                         size: 9, font: helveticaFont, color: black,
                         maxWidth: 350
@@ -611,8 +576,7 @@
                 drawSection('COORDONNEES');
                 drawField('Telephone', formDataGlobal.phone);
                 drawField('Email', formDataGlobal.email);
-                drawField('Email secondaire', formDataGlobal.email2);
-                drawField('Facebook', formDataGlobal.facebook);
+                drawField('Email secondaire', formDataGlobal.email2 || '-');
                 
                 // Professional
                 drawSection('INFORMATIONS PROFESSIONNELLES');
@@ -623,7 +587,7 @@
                 
                 // Party
                 drawSection('INFORMATIONS PARTISANES');
-                drawField('Fonction souhaitee', formDataGlobal.position);
+                drawSection('Fonction souhaitee', formDataGlobal.position);
                 drawField('Motivation', formDataGlobal.motivation);
                 drawField('Domaines d\'interet', formDataGlobal.interests);
                 
@@ -655,13 +619,13 @@
                     size: 8, font: helveticaFont, color: white
                 });
                 
-                // Save
+                // Save PDF
                 const pdfBytes = await pdfDoc.save();
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const filename = `Adhesion_Istiqlal_${formDataGlobal.fullname || 'nouveau'}_${Date.now()}.pdf`;
                 saveAs(blob, filename);
                 
-                btnText.textContent = '✓ PDF telecharge avec succes';
+                btnText.textContent = '✓ PDF téléchargé avec succès';
                 setTimeout(() => {
                     btnText.textContent = originalText;
                     btn.disabled = false;
@@ -669,51 +633,71 @@
                 
             } catch (error) {
                 console.error('PDF Generation Error:', error);
-                alert('Erreur lors de la generation du PDF: ' + error.message);
+                alert('Erreur lors de la génération du PDF: ' + error.message);
                 btnText.textContent = originalText;
                 btn.disabled = false;
             }
         }
 
-        // Form submission
+        // Form submission to Google Sheets
         document.getElementById('multiStepForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!document.getElementById('confirm').checked) {
                 alert('يرجى تأكيد صحة المعلومات');
                 return;
             }
+            
             const submitBtn = document.getElementById('submitBtn');
             const spinner = document.getElementById('spinner');
             const btnText = document.getElementById('btnText');
+            
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
             spinner.style.display = 'block';
-            btnText.innerHTML = '<span class="text-sm">جاري الإرسال...</span>';
+            btnText.textContent = 'جاري الإرسال...';
 
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
+            
+            // Collect checkboxes
             const interests = [];
             document.querySelectorAll('input[name="interests"]:checked').forEach(cb => interests.push(cb.value));
             data.interests = interests.join(', ');
+            
+            // Store for PDF
             formDataGlobal = data;
 
             try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST', mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(data)
-                });
+                // Check if SCRIPT_URL is configured
+                if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                    console.warn('️ Google Apps Script URL not configured!');
+                    console.log('Data would be sent:', data);
+                    // For demo purposes, still show success
+                } else {
+                    // Send to Google Sheets
+                    await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                }
+                
+                // Show success message
                 document.getElementById('multiStepForm').classList.add('hidden');
                 document.querySelector('.flex.gap-4').classList.add('hidden');
                 document.getElementById('successMessage').classList.remove('hidden');
                 document.getElementById('successContact').textContent = data.phone + ' - ' + data.email;
+                
             } catch (error) {
-                console.error('Error:', error);
-                alert('حدث خطأ أثناء الإرسال.');
+                console.error('Submission Error:', error);
+                alert('حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.');
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
                 spinner.style.display = 'none';
-                btnText.innerHTML = 'تأكيد الانخراط <span class="block text-xs opacity-80">Confirmer</span>';
+                btnText.textContent = 'تأكيد الانخراط';
             }
         });
 
