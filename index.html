@@ -2,27 +2,25 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نموذج الانخراط - حزب الاستقلال | Formulaire d'adhésion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج الانخراط - حزب الاستقلال</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- pdf-lib library -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- FileSaver for downloading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Cairo', 'Inter', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
                     colors: {
                         istiqlal: {
-                            pink: '#E91E63',
-                            pinkDark: '#C2185B',
-                            pinkLight: '#F48FB1',
-                            pinkSoft: '#FCE4EC',
-                            black: '#1A1A1A',
-                            gray: '#2D2D2D',
-                            grayLight: '#404040'
+                            pink: '#E91E63', pinkDark: '#C2185B', pinkLight: '#F48FB1',
+                            black: '#1A1A1A', gray: '#2D2D2D'
                         }
                     }
                 }
@@ -31,274 +29,119 @@
     </script>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: linear-gradient(135deg, #1A1A1A 0%, #2D1F2E 50%, #1A1A1A 100%);
             min-height: 100vh;
             font-family: 'Cairo', sans-serif;
         }
-        
         .bg-animated {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
             background: linear-gradient(135deg, #1A1A1A 0%, #2D1F2E 100%);
             overflow: hidden;
         }
-        
         .bg-animated::before, .bg-animated::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.4;
+            content: ''; position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.4;
             animation: float 20s infinite ease-in-out;
         }
-        
         .bg-animated::before {
-            width: clamp(400px, 60vw, 700px);
-            height: clamp(400px, 60vw, 700px);
-            background: #E91E63;
-            top: -15%;
-            right: -10%;
-            animation-delay: 0s;
+            width: clamp(400px, 60vw, 700px); height: clamp(400px, 60vw, 700px);
+            background: #E91E63; top: -15%; right: -10%;
         }
-        
         .bg-animated::after {
-            width: clamp(300px, 50vw, 600px);
-            height: clamp(300px, 50vw, 600px);
-            background: #F48FB1;
-            bottom: -15%;
-            left: -10%;
-            animation-delay: -10s;
+            width: clamp(300px, 50vw, 600px); height: clamp(300px, 50vw, 600px);
+            background: #F48FB1; bottom: -15%; left: -10%; animation-delay: -10s;
         }
-
         @keyframes float {
             0%, 100% { transform: translate(0, 0) scale(1); }
             33% { transform: translate(30px, -50px) scale(1.1); }
             66% { transform: translate(-20px, 20px) scale(0.9); }
         }
-
         .glass-card {
             background: rgba(26, 26, 26, 0.9);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 2px solid rgba(233, 30, 99, 0.3);
-            box-shadow: 0 25px 50px -12px rgba(233, 30, 99, 0.3), 
-                        0 0 100px rgba(233, 30, 99, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(233, 30, 99, 0.3);
         }
-
         .input-field {
             background: rgba(45, 45, 45, 0.7);
             border: 2px solid rgba(233, 30, 99, 0.3);
             transition: all 0.3s ease;
         }
-        
         .input-field:focus {
             background: rgba(45, 45, 45, 0.9);
             border-color: #E91E63;
             box-shadow: 0 0 0 4px rgba(233, 30, 99, 0.2);
             outline: none;
         }
-        
-        .input-field::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .input-label {
-            color: #F48FB1;
-            font-weight: 600;
-        }
-
+        .input-label { color: #F48FB1; font-weight: 600; }
         .btn-primary {
             background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%);
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.6s;
-        }
-        
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(233, 30, 99, 0.5);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid #E91E63;
-            color: #E91E63;
             transition: all 0.3s ease;
         }
-        
-        .btn-secondary:hover {
-            background: rgba(233, 30, 99, 0.1);
-            transform: translateY(-2px);
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(233, 30, 99, 0.5); }
+        .btn-secondary { background: transparent; border: 2px solid #E91E63; color: #E91E63; transition: all 0.3s ease; }
+        .btn-secondary:hover { background: rgba(233, 30, 99, 0.1); }
+        .btn-pdf {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            transition: all 0.3s ease;
         }
-
-        .progress-bar {
-            background: rgba(45, 45, 45, 0.8);
-            border-radius: 9999px;
-            overflow: hidden;
-            height: 8px;
-        }
-        
+        .btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5); }
+        .progress-bar { background: rgba(45, 45, 45, 0.8); border-radius: 9999px; overflow: hidden; height: 8px; }
         .progress-fill {
-            background: linear-gradient(90deg, #E91E63, #F48FB1);
-            height: 100%;
-            transition: width 0.5s ease;
-            border-radius: 9999px;
-            box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
+            background: linear-gradient(90deg, #E91E63, #F48FB1); height: 100%;
+            transition: width 0.5s ease; box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
         }
-
         .step-indicator {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(45, 45, 45, 0.8);
-            border: 2px solid rgba(233, 30, 99, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(45, 45, 45, 0.8); border: 2px solid rgba(233, 30, 99, 0.3);
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
             transition: all 0.3s ease;
         }
-        
         .step-indicator.active {
             background: linear-gradient(135deg, #E91E63, #C2185B);
-            border-color: #E91E63;
-            box-shadow: 0 0 20px rgba(233, 30, 99, 0.6);
-            transform: scale(1.1);
+            border-color: #E91E63; box-shadow: 0 0 20px rgba(233, 30, 99, 0.6); transform: scale(1.1);
         }
-        
-        .step-indicator.completed {
-            background: #10B981;
-            border-color: #10B981;
-        }
-
-        .step-content {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .step-content.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
+        .step-indicator.completed { background: #10B981; border-color: #10B981; }
+        .step-content { display: none; animation: fadeIn 0.5s ease; }
+        .step-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
         .party-logo {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #E91E63, #F48FB1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 25px;
-            box-shadow: 0 0 40px rgba(233, 30, 99, 0.6);
-            animation: pulse 3s infinite;
+            width: 100px; height: 100px;
+            background: linear-gradient(135deg, #E91E63, #F48FB1); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 25px;
+            box-shadow: 0 0 40px rgba(233, 30, 99, 0.6); animation: pulse 3s infinite;
         }
-        
         @keyframes pulse {
             0%, 100% { box-shadow: 0 0 40px rgba(233, 30, 99, 0.6); }
             50% { box-shadow: 0 0 60px rgba(233, 30, 99, 0.9); }
         }
-
-        .scales-icon {
-            width: 60px;
-            height: 60px;
-            fill: white;
-        }
-
+        .scales-icon { width: 60px; height: 60px; fill: white; }
         .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 3px solid #ffffff;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%;
+            border-top: 3px solid #ffffff; width: 24px; height: 24px;
+            animation: spin 1s linear infinite; display: none;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .success-checkmark {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+            width: 80px; height: 80px; border-radius: 50%;
             background: linear-gradient(135deg, #10B981, #059669);
-            margin: 0 auto;
-            position: relative;
+            margin: 0 auto; position: relative;
             animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        
         .success-checkmark::after {
-            content: '';
-            position: absolute;
-            left: 26px;
-            top: 16px;
-            width: 20px;
-            height: 40px;
-            border: solid white;
-            border-width: 0 4px 4px 0;
-            transform: rotate(45deg);
+            content: ''; position: absolute; left: 26px; top: 16px;
+            width: 20px; height: 40px; border: solid white;
+            border-width: 0 4px 4px 0; transform: rotate(45deg);
         }
-        
-        @keyframes popIn {
-            0% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .review-item {
-            background: rgba(45, 45, 45, 0.5);
-            border-right: 3px solid #E91E63;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            background: rgba(45, 45, 45, 0.5); border-right: 3px solid #E91E63;
+            padding: 12px; border-radius: 8px; margin-bottom: 10px;
         }
-
         @media screen and (max-width: 768px) {
-            input, select, textarea {
-                font-size: 16px !important;
-            }
-            .step-indicator {
-                width: 35px;
-                height: 35px;
-                font-size: 14px;
-            }
+            input, select, textarea { font-size: 16px !important; }
+            .step-indicator { width: 35px; height: 35px; font-size: 14px; }
         }
     </style>
 </head>
@@ -308,27 +151,20 @@
 
     <main class="w-full max-w-[min(700px,95vw)] glass-card rounded-3xl p-6 sm:p-10 relative overflow-hidden my-10">
         
-        <!-- Party Logo -->
         <div class="party-logo">
             <svg class="scales-icon" viewBox="0 0 24 24">
                 <path d="M12 2C12.55 2 13 2.45 13 3V6H19C19.55 6 20 6.45 20 7C20 7.55 19.55 8 19 8H17V14H20C20.55 14 21 14.45 21 15C21 15.55 20.55 16 20 16H4C3.45 16 3 15.55 3 15C3 14.45 3.45 14 4 14H7V8H5C4.45 8 4 7.55 4 7C4 6.45 4.45 6 5 6H11V3C11 2.45 11.45 2 12 2M7 8V14H17V8H7M9 18H11V22H9V18M13 18H15V22H13V18Z"/>
             </svg>
         </div>
 
-        <!-- Header -->
         <div class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold mb-2 bg-gradient-to-r from-pink-400 via-pink-300 to-pink-400 bg-clip-text text-transparent">
-                حزب الاستقلال
-            </h1>
+            <h1 class="text-3xl sm:text-4xl font-bold mb-2 bg-gradient-to-r from-pink-400 via-pink-300 to-pink-400 bg-clip-text text-transparent">حزب الاستقلال</h1>
             <p class="text-pink-300 text-lg font-bold mb-1">ISTIQLAL PARTY</p>
             <p class="text-gray-400 text-sm">نموذج انخراط الشبيبة الاستقلالية</p>
         </div>
 
-        <!-- Progress Bar -->
         <div class="mb-8">
-            <div class="progress-bar mb-3">
-                <div class="progress-fill" id="progressBar" style="width: 20%"></div>
-            </div>
+            <div class="progress-bar mb-3"><div class="progress-fill" id="progressBar" style="width: 20%"></div></div>
             <div class="flex justify-between items-center">
                 <div class="step-indicator active" data-step="1">1</div>
                 <div class="step-indicator" data-step="2">2</div>
@@ -337,123 +173,86 @@
                 <div class="step-indicator" data-step="5">5</div>
             </div>
             <div class="flex justify-between text-xs text-gray-400 mt-2 px-2">
-                <span>الشخصية</span>
-                <span>الاتصال</span>
-                <span>المهنية</span>
-                <span>الحزبية</span>
-                <span>التأكيد</span>
+                <span>الشخصية</span><span>الاتصال</span><span>المهنية</span><span>الحزبية</span><span>التأكيد</span>
             </div>
         </div>
 
-        <!-- Form -->
         <form id="multiStepForm" novalidate>
             
-            <!-- Step 1: Personal Information -->
             <div class="step-content active" data-step="1">
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm">1</span>
                     المعلومات الشخصية
-                    <span class="text-sm text-gray-500 font-['Inter'] mr-auto">(Informations personnelles)</span>
+                    <span class="text-sm text-gray-500 mr-auto">(Informations personnelles)</span>
                 </h2>
-                
                 <div class="space-y-4">
                     <div>
                         <label class="input-label block text-sm mb-2">الاسم الكامل <span class="text-gray-500 text-xs">(Nom Complet)</span></label>
-                        <input type="text" id="fullname" name="fullname" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-white"
-                            placeholder="أدخل اسمك الكامل">
+                        <input type="text" id="fullname" name="fullname" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="أدخل اسمك الكامل">
                     </div>
-                    
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="input-label block text-sm mb-2">تاريخ الازدياد <span class="text-gray-500 text-xs">(Date de naissance)</span></label>
-                            <input type="date" id="birthdate" name="birthdate" 
-                                class="input-field w-full rounded-xl px-4 py-3 text-white">
+                            <input type="date" id="birthdate" name="birthdate" class="input-field w-full rounded-xl px-4 py-3 text-white">
                         </div>
                         <div>
                             <label class="input-label block text-sm mb-2">مكان الازدياد <span class="text-gray-500 text-xs">(Lieu de naissance)</span></label>
-                            <input type="text" id="birthplace" name="birthplace" 
-                                class="input-field w-full rounded-xl px-4 py-3 text-white"
-                                placeholder="المدينة">
+                            <input type="text" id="birthplace" name="birthplace" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="المدينة">
                         </div>
                     </div>
-                    
                     <div>
-                        <label class="input-label block text-sm mb-2">العنوان الكامل <span class="text-gray-500 text-xs">(Adresse complète)</span></label>
-                        <textarea id="address" name="address" rows="3"
-                            class="input-field w-full rounded-xl px-4 py-3 text-white"
-                            placeholder="العنوان الكامل للإقامة"></textarea>
+                        <label class="input-label block text-sm mb-2">العنوان الكامل <span class="text-gray-500 text-xs">(Adresse)</span></label>
+                        <textarea id="address" name="address" rows="3" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="العنوان الكامل"></textarea>
                     </div>
-                    
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="input-label block text-sm mb-2">المدينة <span class="text-gray-500 text-xs">(Ville)</span></label>
-                            <input type="text" id="city" name="city" 
-                                class="input-field w-full rounded-xl px-4 py-3 text-white"
-                                placeholder="المدينة">
+                            <input type="text" id="city" name="city" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="المدينة">
                         </div>
                         <div>
                             <label class="input-label block text-sm mb-2">الجهة <span class="text-gray-500 text-xs">(Région)</span></label>
-                            <input type="text" id="region" name="region" 
-                                class="input-field w-full rounded-xl px-4 py-3 text-white"
-                                placeholder="الجهة">
+                            <input type="text" id="region" name="region" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="الجهة">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Step 2: Contact Information -->
             <div class="step-content" data-step="2">
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm">2</span>
                     معلومات الاتصال
-                    <span class="text-sm text-gray-500 font-['Inter'] mr-auto">(Coordonnées)</span>
+                    <span class="text-sm text-gray-500 mr-auto">(Coordonnées)</span>
                 </h2>
-                
                 <div class="space-y-4">
                     <div>
                         <label class="input-label block text-sm mb-2">رقم الهاتف <span class="text-gray-500 text-xs">(Téléphone)</span></label>
-                        <input type="tel" id="phone" name="phone" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-white"
-                            placeholder="06XXXXXXXX">
+                        <input type="tel" id="phone" name="phone" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="06XXXXXXXX">
                     </div>
-                    
                     <div>
                         <label class="input-label block text-sm mb-2">البريد الإلكتروني <span class="text-gray-500 text-xs">(E-mail)</span></label>
-                        <input type="email" id="email" name="email" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-white"
-                            placeholder="exemple@email.com">
+                        <input type="email" id="email" name="email" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="exemple@email.com">
                     </div>
-                    
                     <div>
-                        <label class="input-label block text-sm mb-2">البريد الإلكتروني البديل <span class="text-gray-500 text-xs">(E-mail secondaire)</span></label>
-                        <input type="email" id="email2" name="email2" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-white"
-                            placeholder="اختياري">
+                        <label class="input-label block text-sm mb-2">البريد البديل <span class="text-gray-500 text-xs">(E-mail secondaire)</span></label>
+                        <input type="email" id="email2" name="email2" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="اختياري">
                     </div>
-                    
                     <div>
                         <label class="input-label block text-sm mb-2">حساب فيسبوك <span class="text-gray-500 text-xs">(Facebook)</span></label>
-                        <input type="text" id="facebook" name="facebook" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-white"
-                            placeholder="رابط حساب فيسبوك (اختياري)">
+                        <input type="text" id="facebook" name="facebook" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="رابط حساب فيسبوك">
                     </div>
                 </div>
             </div>
 
-            <!-- Step 3: Professional/Educational Info -->
             <div class="step-content" data-step="3">
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm">3</span>
                     المعلومات المهنية والدراسية
-                    <span class="text-sm text-gray-500 font-['Inter'] mr-auto">(Professionnel & Études)</span>
+                    <span class="text-sm text-gray-500 mr-auto">(Professionnel & Études)</span>
                 </h2>
-                
                 <div class="space-y-4">
                     <div>
                         <label class="input-label block text-sm mb-2">المستوى الدراسي <span class="text-gray-500 text-xs">(Niveau d'études)</span></label>
-                        <select id="education" name="education" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-white bg-transparent">
+                        <select id="education" name="education" class="input-field w-full rounded-xl px-4 py-3 text-white bg-transparent">
                             <option value="" class="bg-gray-800">اختر المستوى...</option>
                             <option value="college" class="bg-gray-800">إعدادي</option>
                             <option value="lycee" class="bg-gray-800">ثانوي</option>
@@ -463,18 +262,13 @@
                             <option value="autre" class="bg-gray-800">أخرى</option>
                         </select>
                     </div>
-                    
                     <div>
                         <label class="input-label block text-sm mb-2">التخصص <span class="text-gray-500 text-xs">(Spécialité)</span></label>
-                        <input type="text" id="specialty" name="specialty" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-white"
-                            placeholder="التخصص الدراسي أو المهني">
+                        <input type="text" id="specialty" name="specialty" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="التخصص">
                     </div>
-                    
                     <div>
                         <label class="input-label block text-sm mb-2">الوضعية المهنية <span class="text-gray-500 text-xs">(Situation professionnelle)</span></label>
-                        <select id="jobStatus" name="jobStatus" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-white bg-transparent">
+                        <select id="jobStatus" name="jobStatus" class="input-field w-full rounded-xl px-4 py-3 text-white bg-transparent">
                             <option value="" class="bg-gray-800">اختر الوضعية...</option>
                             <option value="student" class="bg-gray-800">طالب/ة</option>
                             <option value="employee" class="bg-gray-800">موظف/ة</option>
@@ -483,70 +277,60 @@
                             <option value="other" class="bg-gray-800">أخرى</option>
                         </select>
                     </div>
-                    
                     <div>
                         <label class="input-label block text-sm mb-2">المهنة <span class="text-gray-500 text-xs">(Profession)</span></label>
-                        <input type="text" id="profession" name="profession" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-white"
-                            placeholder="المهنة الحالية">
+                        <input type="text" id="profession" name="profession" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="المهنة الحالية">
                     </div>
                 </div>
             </div>
 
-            <!-- Step 4: Party Information -->
             <div class="step-content" data-step="4">
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm">4</span>
                     المعلومات الحزبية
-                    <span class="text-sm text-gray-500 font-['Inter'] mr-auto">(Informations partisanes)</span>
+                    <span class="text-sm text-gray-500 mr-auto">(Informations partisanes)</span>
                 </h2>
-                
                 <div class="space-y-4">
                     <div>
-                        <label class="input-label block text-sm mb-2">الصفة المطلوبة <span class="text-gray-500 text-xs">(Fonction souhaitée)</span></label>
-                        <select id="position" name="position" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-white bg-transparent">
+                        <label class="input-label block text-sm mb-2">الصفة المطلوبة <span class="text-gray-500 text-xs">(Fonction)</span></label>
+                        <select id="position" name="position" class="input-field w-full rounded-xl px-4 py-3 text-white bg-transparent">
                             <option value="" class="bg-gray-800">اختر الصفة...</option>
-                            <option value="membre" class="bg-gray-800">عضو بسيط (Membre simple)</option>
-                            <option value="responsable" class="bg-gray-800">مسؤول محلي (Responsable local)</option>
-                            <option value="coordinateur" class="bg-gray-800">منسق (Coordinateur)</option>
-                            <option value="animateur" class="bg-gray-800">منشط (Animateur)</option>
-                            <option value="autre" class="bg-gray-800">أخرى (Autre)</option>
+                            <option value="membre" class="bg-gray-800">عضو بسيط</option>
+                            <option value="responsable" class="bg-gray-800">مسؤول محلي</option>
+                            <option value="coordinateur" class="bg-gray-800">منسق</option>
+                            <option value="animateur" class="bg-gray-800">منشط</option>
+                            <option value="autre" class="bg-gray-800">أخرى</option>
                         </select>
                     </div>
-                    
                     <div>
                         <label class="input-label block text-sm mb-2">لماذا تريد الانخراط؟ <span class="text-gray-500 text-xs">(Motivation)</span></label>
-                        <textarea id="motivation" name="motivation" rows="4"
-                            class="input-field w-full rounded-xl px-4 py-3 text-white"
-                            placeholder="اشرح دوافعك للانخراط في حزب الاستقلال..."></textarea>
+                        <textarea id="motivation" name="motivation" rows="4" class="input-field w-full rounded-xl px-4 py-3 text-white" placeholder="اشرح دوافعك..."></textarea>
                     </div>
-                    
                     <div>
                         <label class="input-label block text-sm mb-2">المجالات التي تهتم بها <span class="text-gray-500 text-xs">(Domaines d'intérêt)</span></label>
                         <div class="grid grid-cols-2 gap-3">
                             <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="social" class="w-5 h-5 rounded border-pink-500 text-pink-600 focus:ring-pink-500">
+                                <input type="checkbox" name="interests" value="social" class="w-5 h-5 rounded border-pink-500 text-pink-600">
                                 <span class="text-sm">الشأن الاجتماعي</span>
                             </label>
                             <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="economic" class="w-5 h-5 rounded border-pink-500 text-pink-600 focus:ring-pink-500">
+                                <input type="checkbox" name="interests" value="economic" class="w-5 h-5 rounded border-pink-500 text-pink-600">
                                 <span class="text-sm">الشأن الاقتصادي</span>
                             </label>
                             <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="cultural" class="w-5 h-5 rounded border-pink-500 text-pink-600 focus:ring-pink-500">
+                                <input type="checkbox" name="interests" value="cultural" class="w-5 h-5 rounded border-pink-500 text-pink-600">
                                 <span class="text-sm">الشأن الثقافي</span>
                             </label>
                             <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="environmental" class="w-5 h-5 rounded border-pink-500 text-pink-600 focus:ring-pink-500">
+                                <input type="checkbox" name="interests" value="environmental" class="w-5 h-5 rounded border-pink-500 text-pink-600">
                                 <span class="text-sm">الشأن البيئي</span>
                             </label>
                             <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="youth" class="w-5 h-5 rounded border-pink-500 text-pink-600 focus:ring-pink-500">
+                                <input type="checkbox" name="interests" value="youth" class="w-5 h-5 rounded border-pink-500 text-pink-600">
                                 <span class="text-sm">شؤون الشباب</span>
                             </label>
                             <label class="flex items-center gap-2 p-3 rounded-lg bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition">
-                                <input type="checkbox" name="interests" value="education" class="w-5 h-5 rounded border-pink-500 text-pink-600 focus:ring-pink-500">
+                                <input type="checkbox" name="interests" value="education" class="w-5 h-5 rounded border-pink-500 text-pink-600">
                                 <span class="text-sm">التعليم والتكوين</span>
                             </label>
                         </div>
@@ -554,97 +338,86 @@
                 </div>
             </div>
 
-            <!-- Step 5: Review & Submit -->
             <div class="step-content" data-step="5">
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-sm">5</span>
                     المراجعة والتأكيد
-                    <span class="text-sm text-gray-500 font-['Inter'] mr-auto">(Révision)</span>
+                    <span class="text-sm text-gray-500 mr-auto">(Révision)</span>
                 </h2>
-                
                 <div class="bg-gray-800/30 rounded-xl p-4 mb-4">
                     <h3 class="text-lg font-bold text-pink-400 mb-3">المعلومات الشخصية</h3>
                     <div id="review-personal" class="space-y-2"></div>
                 </div>
-                
                 <div class="bg-gray-800/30 rounded-xl p-4 mb-4">
                     <h3 class="text-lg font-bold text-pink-400 mb-3">معلومات الاتصال</h3>
                     <div id="review-contact" class="space-y-2"></div>
                 </div>
-                
                 <div class="bg-gray-800/30 rounded-xl p-4 mb-4">
                     <h3 class="text-lg font-bold text-pink-400 mb-3">المعلومات المهنية</h3>
                     <div id="review-professional" class="space-y-2"></div>
                 </div>
-                
                 <div class="bg-gray-800/30 rounded-xl p-4 mb-4">
                     <h3 class="text-lg font-bold text-pink-400 mb-3">المعلومات الحزبية</h3>
                     <div id="review-party" class="space-y-2"></div>
                 </div>
-                
                 <div class="flex items-start gap-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-                    <input type="checkbox" id="confirm" name="confirm" required 
-                        class="w-5 h-5 mt-1 rounded border-yellow-500 text-yellow-600 focus:ring-yellow-500">
+                    <input type="checkbox" id="confirm" name="confirm" required class="w-5 h-5 mt-1 rounded border-yellow-500 text-yellow-600">
                     <label for="confirm" class="text-sm text-yellow-200">
-                        أؤكد صحة المعلومات المدلاة وألتزم بقوانين وأنظمة حزب الاستقلال
-                        <span class="block text-xs text-gray-400 mt-1">Je certifie l'exactitude des informations et m'engage à respecter les règles du parti</span>
+                        أؤكد صحة المعلومات وألتزم بقوانين حزب الاستقلال
+                        <span class="block text-xs text-gray-400 mt-1">Je certifie l'exactitude des informations</span>
                     </label>
                 </div>
             </div>
 
-            <!-- Navigation Buttons -->
             <div class="flex gap-4 mt-8 pt-6 border-t border-gray-700">
-                <button type="button" id="prevBtn" onclick="changeStep(-1)" 
-                    class="btn-secondary flex-1 py-3 px-6 rounded-xl font-bold hidden">
-                    السابق
-                    <span class="block text-xs font-['Inter'] opacity-80">Précédent</span>
+                <button type="button" id="prevBtn" onclick="changeStep(-1)" class="btn-secondary flex-1 py-3 px-6 rounded-xl font-bold hidden">
+                    السابق <span class="block text-xs opacity-80">Précédent</span>
                 </button>
-                
-                <button type="button" id="nextBtn" onclick="changeStep(1)" 
-                    class="btn-primary flex-1 py-3 px-6 rounded-xl font-bold">
-                    التالي
-                    <span class="block text-xs font-['Inter'] opacity-80">Suivant</span>
+                <button type="button" id="nextBtn" onclick="changeStep(1)" class="btn-primary flex-1 py-3 px-6 rounded-xl font-bold">
+                    التالي <span class="block text-xs opacity-80">Suivant</span>
                 </button>
-                
-                <button type="submit" id="submitBtn" 
-                    class="btn-primary flex-1 py-3 px-6 rounded-xl font-bold hidden">
+                <button type="submit" id="submitBtn" class="btn-primary flex-1 py-3 px-6 rounded-xl font-bold hidden">
                     <span class="spinner" id="spinner"></span>
-                    <span id="btnText">
-                        تأكيد الانخراط
-                        <span class="block text-xs font-['Inter'] opacity-80">Confirmer l'adhésion</span>
-                    </span>
+                    <span id="btnText">تأكيد الانخراط <span class="block text-xs opacity-80">Confirmer</span></span>
                 </button>
             </div>
-
         </form>
 
-        <!-- Success Message -->
         <div id="successMessage" class="hidden text-center py-10">
             <div class="success-checkmark mb-6"></div>
             <h2 class="text-3xl font-bold text-emerald-400 mb-3">تم التسجيل بنجاح!</h2>
             <p class="text-gray-300 mb-2 text-lg">شكرا لانضمامك لحزب الاستقلال</p>
-            <p class="text-pink-300 text-sm font-['Inter'] mb-6">Inscription réussie avec succès</p>
+            <p class="text-pink-300 text-sm mb-6">Inscription réussie avec succès</p>
             <div class="bg-gray-800/50 rounded-xl p-4 mb-6 text-right">
-                <p class="text-sm text-gray-400 mb-2">سيتم التواصل معك قريبا على:</p>
+                <p class="text-sm text-gray-400 mb-2">سيتم التواصل معك على:</p>
                 <p class="text-pink-400 font-bold" id="successContact"></p>
             </div>
-            <button onclick="resetForm()" 
-                class="px-8 py-3 border-2 border-pink-500 text-pink-400 rounded-xl hover:bg-pink-500 hover:text-white transition-all duration-300 font-bold">
+            
+            <!-- PDF Download Button (Data-driven) -->
+            <button onclick="generateDataDrivenPDF()" id="pdfBtn"
+                class="btn-pdf px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 mx-auto mb-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span id="pdfBtnText">تحميل نسخة PDF (بيانات حقيقية)</span>
+            </button>
+            
+            <button onclick="resetForm()" class="px-8 py-3 border-2 border-pink-500 text-pink-400 rounded-xl hover:bg-pink-500 hover:text-white transition-all duration-300 font-bold">
                 تسجيل انخراط جديد
             </button>
         </div>
-
     </main>
 
     <script>
         let currentStep = 1;
         const totalSteps = 5;
         const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+        let formDataGlobal = {};
 
+        // ===== Multi-Step Logic =====
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
-            
             document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
                 const stepNum = index + 1;
                 indicator.classList.remove('active', 'completed');
@@ -660,114 +433,301 @@
         }
 
         function changeStep(direction) {
-            // Validate current step
-            if (direction === 1 && !validateStep(currentStep)) {
-                return;
-            }
-
-            // Hide current step
+            if (direction === 1 && !validateStep(currentStep)) return;
             document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.remove('active');
-            
-            // Update step
             currentStep += direction;
-            
-            // Show new step
             document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
-            
-            // Update buttons
             updateButtons();
-            
-            // Update progress
             updateProgress();
-            
-            // If moving to step 5, populate review
-            if (currentStep === 5) {
-                populateReview();
-            }
-            
-            // Scroll to top
+            if (currentStep === 5) populateReview();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function updateButtons() {
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            if (currentStep === 1) {
-                prevBtn.classList.add('hidden');
-            } else {
-                prevBtn.classList.remove('hidden');
-            }
-            
-            if (currentStep === totalSteps) {
-                nextBtn.classList.add('hidden');
-                submitBtn.classList.remove('hidden');
-            } else {
-                nextBtn.classList.remove('hidden');
-                submitBtn.classList.add('hidden');
-            }
+            document.getElementById('prevBtn').classList.toggle('hidden', currentStep === 1);
+            document.getElementById('nextBtn').classList.toggle('hidden', currentStep === totalSteps);
+            document.getElementById('submitBtn').classList.toggle('hidden', currentStep !== totalSteps);
         }
 
         function validateStep(step) {
             let isValid = true;
             const stepContent = document.querySelector(`.step-content[data-step="${step}"]`);
             const inputs = stepContent.querySelectorAll('input[required], select[required], textarea[required]');
-            
             inputs.forEach(input => {
                 if (!input.value.trim()) {
                     isValid = false;
                     input.classList.add('border-red-500');
                     setTimeout(() => input.classList.remove('border-red-500'), 2000);
-                } else {
-                    input.classList.remove('border-red-500');
                 }
             });
-            
-            if (!isValid) {
-                alert('يرجى ملء جميع الحقول المطلوبة');
-            }
-            
+            if (!isValid) alert('يرجى ملء جميع الحقول المطلوبة');
             return isValid;
         }
 
         function populateReview() {
             const formData = new FormData(document.getElementById('multiStepForm'));
             const data = Object.fromEntries(formData);
-            
             document.getElementById('review-personal').innerHTML = `
                 <div class="review-item"><span class="text-gray-400 text-sm">الاسم الكامل:</span><p class="font-semibold">${data.fullname || '-'}</p></div>
                 <div class="review-item"><span class="text-gray-400 text-sm">تاريخ الازدياد:</span><p class="font-semibold">${data.birthdate || '-'}</p></div>
                 <div class="review-item"><span class="text-gray-400 text-sm">المدينة:</span><p class="font-semibold">${data.city || '-'}</p></div>
             `;
-            
             document.getElementById('review-contact').innerHTML = `
                 <div class="review-item"><span class="text-gray-400 text-sm">الهاتف:</span><p class="font-semibold">${data.phone || '-'}</p></div>
                 <div class="review-item"><span class="text-gray-400 text-sm">البريد الإلكتروني:</span><p class="font-semibold">${data.email || '-'}</p></div>
             `;
-            
             document.getElementById('review-professional').innerHTML = `
                 <div class="review-item"><span class="text-gray-400 text-sm">المستوى الدراسي:</span><p class="font-semibold">${data.education || '-'}</p></div>
                 <div class="review-item"><span class="text-gray-400 text-sm">الوضعية المهنية:</span><p class="font-semibold">${data.jobStatus || '-'}</p></div>
             `;
-            
             document.getElementById('review-party').innerHTML = `
                 <div class="review-item"><span class="text-gray-400 text-sm">الصفة:</span><p class="font-semibold">${data.position || '-'}</p></div>
             `;
         }
 
+        // ===== DATA-DRIVEN PDF GENERATION =====
+        async function generateDataDrivenPDF() {
+            const btn = document.getElementById('pdfBtn');
+            const btnText = document.getElementById('pdfBtnText');
+            const originalText = btnText.textContent;
+            
+            btn.disabled = true;
+            btnText.textContent = 'جاري إنشاء PDF... (Génération en cours)';
+            
+            try {
+                const { PDFDocument, rgb, StandardFonts } = PDFLib;
+                
+                // Create PDF document
+                const pdfDoc = await PDFDocument.create();
+                const page = pdfDoc.addPage([595, 842]); // A4
+                const { width, height } = page.getSize();
+                
+                // Load Cairo font from Google Fonts (Arabic support)
+                const fontUrl = 'https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6HkvaIo4hB4PbJbh.woff2';
+                const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+                const cairoFont = await pdfDoc.embedFont(fontBytes);
+                const cairoFontBold = await pdfDoc.embedFont(fontBytes); // Same font, we'll use size for emphasis
+                
+                // Colors
+                const pinkColor = rgb(0.914, 0.118, 0.388); // #E91E63
+                const darkPink = rgb(0.761, 0.094, 0.357); // #C2185B
+                const black = rgb(0.1, 0.1, 0.1);
+                const gray = rgb(0.4, 0.4, 0.4);
+                const lightGray = rgb(0.9, 0.9, 0.9);
+                const white = rgb(1, 1, 1);
+                
+                // ===== HEADER =====
+                // Pink top bar
+                page.drawRectangle({
+                    x: 0, y: height - 120, width: width, height: 120,
+                    color: pinkColor
+                });
+                
+                // Draw scales icon (simplified) - circle with star
+                page.drawCircle({
+                    x: width / 2, y: height - 60, size: 35,
+                    color: white, opacity: 0.3
+                });
+                
+                // Title
+                page.drawText('حزب الاستقلال', {
+                    x: width / 2, y: height - 50,
+                    size: 28, font: cairoFont, color: white,
+                    textAlign: 'center'
+                });
+                page.drawText('ISTIQLAL PARTY', {
+                    x: width / 2, y: height - 80,
+                    size: 14, font: cairoFont, color: white,
+                    textAlign: 'center'
+                });
+                
+                // Subtitle
+                page.drawText('استمارة انخراط الشبيبة الاستقلالية', {
+                    x: width / 2, y: height - 140,
+                    size: 16, font: cairoFont, color: pinkColor,
+                    textAlign: 'center'
+                });
+                
+                // Date
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('ar-MA', { year: 'numeric', month: 'long', day: 'numeric' });
+                page.drawText(`تاريخ التسجيل: ${dateStr}`, {
+                    x: width - 40, y: height - 170,
+                    size: 10, font: cairoFont, color: gray,
+                    textAlign: 'right'
+                });
+                
+                // ===== HELPER FUNCTIONS =====
+                let yPos = height - 200;
+                const leftMargin = 40;
+                const rightMargin = width - 40;
+                const lineHeight = 20;
+                
+                function drawSectionTitle(title) {
+                    yPos -= 10;
+                    // Pink line
+                    page.drawLine({
+                        start: { x: leftMargin, y: yPos },
+                        end: { x: rightMargin, y: yPos },
+                        thickness: 2, color: pinkColor
+                    });
+                    yPos -= 25;
+                    page.drawText(title, {
+                        x: rightMargin, y: yPos,
+                        size: 14, font: cairoFont, color: pinkColor,
+                        textAlign: 'right'
+                    });
+                    yPos -= 10;
+                }
+                
+                function drawField(label, value) {
+                    if (yPos < 80) { // New page if needed
+                        const newPage = pdfDoc.addPage([595, 842]);
+                        yPos = height - 50;
+                    }
+                    // Label
+                    page.drawText(label + ':', {
+                        x: rightMargin, y: yPos,
+                        size: 11, font: cairoFont, color: gray,
+                        textAlign: 'right'
+                    });
+                    // Value
+                    const valueText = value || '-';
+                    page.drawText(valueText, {
+                        x: rightMargin - 150, y: yPos,
+                        size: 11, font: cairoFont, color: black,
+                        textAlign: 'right',
+                        maxWidth: 300
+                    });
+                    // Underline
+                    page.drawLine({
+                        start: { x: leftMargin, y: yPos - 5 },
+                        end: { x: rightMargin, y: yPos - 5 },
+                        thickness: 0.5, color: lightGray
+                    });
+                    yPos -= lineHeight;
+                }
+                
+                function drawMultilineField(label, value) {
+                    if (yPos < 100) {
+                        const newPage = pdfDoc.addPage([595, 842]);
+                        yPos = height - 50;
+                    }
+                    page.drawText(label + ':', {
+                        x: rightMargin, y: yPos,
+                        size: 11, font: cairoFont, color: gray,
+                        textAlign: 'right'
+                    });
+                    yPos -= 15;
+                    
+                    const valueText = value || '-';
+                    const lines = valueText.split('\n');
+                    lines.forEach(line => {
+                        if (yPos < 80) {
+                            const newPage = pdfDoc.addPage([595, 842]);
+                            yPos = height - 50;
+                        }
+                        page.drawText(line, {
+                            x: rightMargin - 20, y: yPos,
+                            size: 11, font: cairoFont, color: black,
+                            textAlign: 'right',
+                            maxWidth: width - 80
+                        });
+                        yPos -= 18;
+                    });
+                    yPos -= 5;
+                }
+                
+                // ===== PERSONAL INFO =====
+                drawSectionTitle('📋 المعلومات الشخصية');
+                drawField('الاسم الكامل', formDataGlobal.fullname);
+                drawField('تاريخ الازدياد', formDataGlobal.birthdate);
+                drawField('مكان الازدياد', formDataGlobal.birthplace);
+                drawField('العنوان', formDataGlobal.address);
+                drawField('المدينة', formDataGlobal.city);
+                drawField('الجهة', formDataGlobal.region);
+                
+                // ===== CONTACT INFO =====
+                drawSectionTitle('📞 معلومات الاتصال');
+                drawField('رقم الهاتف', formDataGlobal.phone);
+                drawField('البريد الإلكتروني', formDataGlobal.email);
+                drawField('البريد البديل', formDataGlobal.email2);
+                drawField('فيسبوك', formDataGlobal.facebook);
+                
+                // ===== PROFESSIONAL INFO =====
+                drawSectionTitle('💼 المعلومات المهنية والدراسية');
+                drawField('المستوى الدراسي', formDataGlobal.education);
+                drawField('التخصص', formDataGlobal.specialty);
+                drawField('الوضعية المهنية', formDataGlobal.jobStatus);
+                drawField('المهنة', formDataGlobal.profession);
+                
+                // ===== PARTY INFO =====
+                drawSectionTitle('🎯 المعلومات الحزبية');
+                drawField('الصفة المطلوبة', formDataGlobal.position);
+                drawMultilineField('الدوافع', formDataGlobal.motivation);
+                drawField('المجالات', formDataGlobal.interests);
+                
+                // ===== FOOTER =====
+                yPos -= 20;
+                if (yPos < 100) {
+                    const newPage = pdfDoc.addPage([595, 842]);
+                    yPos = height - 50;
+                }
+                
+                // Confirmation box
+                page.drawRectangle({
+                    x: leftMargin, y: yPos - 40,
+                    width: width - 80, height: 40,
+                    color: rgb(0.988, 0.894, 0.929), // Light pink
+                    borderColor: pinkColor, borderWidth: 1
+                });
+                page.drawText('✓ تم تأكيد صحة المعلومات والالتزام بقوانين حزب الاستقلال', {
+                    x: width / 2, y: yPos - 25,
+                    size: 11, font: cairoFont, color: darkPink,
+                    textAlign: 'center'
+                });
+                
+                // Bottom bar
+                page.drawRectangle({
+                    x: 0, y: 0, width: width, height: 40,
+                    color: pinkColor
+                });
+                page.drawText('حزب الاستقلال - المغرب | www.istiqlal.ma', {
+                    x: width / 2, y: 15,
+                    size: 10, font: cairoFont, color: white,
+                    textAlign: 'center'
+                });
+                
+                // Save PDF
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const filename = `انخراط_حزب_الاستقلال_${formDataGlobal.fullname || 'nouveau'}_${Date.now()}.pdf`;
+                saveAs(blob, filename);
+                
+                btnText.textContent = '✓ تم تحميل PDF بنجاح';
+                setTimeout(() => {
+                    btnText.textContent = originalText;
+                    btn.disabled = false;
+                }, 3000);
+                
+            } catch (error) {
+                console.error('PDF Generation Error:', error);
+                alert('حدث خطأ أثناء إنشاء PDF. يرجى المحاولة مرة أخرى.');
+                btnText.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Form submission
         document.getElementById('multiStepForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             if (!document.getElementById('confirm').checked) {
                 alert('يرجى تأكيد صحة المعلومات');
                 return;
             }
-
             const submitBtn = document.getElementById('submitBtn');
             const spinner = document.getElementById('spinner');
             const btnText = document.getElementById('btnText');
-            
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
             spinner.style.display = 'block';
@@ -775,36 +735,28 @@
 
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
-            
-            // Collect checkboxes
             const interests = [];
-            document.querySelectorAll('input[name="interests"]:checked').forEach(cb => {
-                interests.push(cb.value);
-            });
+            document.querySelectorAll('input[name="interests"]:checked').forEach(cb => interests.push(cb.value));
             data.interests = interests.join(', ');
+            formDataGlobal = data;
 
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8',
-                    },
+                await fetch(SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(data)
                 });
-
                 document.getElementById('multiStepForm').classList.add('hidden');
                 document.querySelector('.flex.gap-4').classList.add('hidden');
                 document.getElementById('successMessage').classList.remove('hidden');
                 document.getElementById('successContact').textContent = data.phone + ' - ' + data.email;
-
             } catch (error) {
                 console.error('Error:', error);
-                alert('حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.');
+                alert('حدث خطأ أثناء الإرسال.');
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
                 spinner.style.display = 'none';
-                btnText.innerHTML = 'تأكيد الانخراط<span class="block text-xs font-[\'Inter\'] opacity-80">Confirmer l\'adhésion</span>';
+                btnText.innerHTML = 'تأكيد الانخراط <span class="block text-xs opacity-80">Confirmer</span>';
             }
         });
 
@@ -813,18 +765,13 @@
             document.getElementById('multiStepForm').classList.remove('hidden');
             document.querySelector('.flex.gap-4').classList.remove('hidden');
             document.getElementById('successMessage').classList.add('hidden');
-            
             currentStep = 1;
-            document.querySelectorAll('.step-content').forEach(content => {
-                content.classList.remove('active');
-            });
+            document.querySelectorAll('.step-content').forEach(c => c.classList.remove('active'));
             document.querySelector('.step-content[data-step="1"]').classList.add('active');
-            
             updateButtons();
             updateProgress();
         }
 
-        // Initialize
         updateButtons();
         updateProgress();
     </script>
