@@ -30,25 +30,15 @@
             color: white; width: 100%; max-width: 100%;
             transition: all 0.3s ease; -webkit-appearance: none; appearance: none;
         }
-        .input-field:focus {
-            border-color: #E91E63; box-shadow: 0 0 0 4px rgba(233, 30, 99, 0.2); outline: none;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%);
-            transition: all 0.3s ease;
-        }
+        .input-field:focus { border-color: #E91E63; box-shadow: 0 0 0 4px rgba(233, 30, 99, 0.2); outline: none; }
+        .btn-primary { background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%); transition: all 0.3s ease; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(233, 30, 99, 0.5); }
-        .btn-pdf {
-            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-            transition: all 0.3s ease;
-        }
+        .btn-pdf { background: linear-gradient(135deg, #10B981 0%, #059669 100%); transition: all 0.3s ease; }
         .btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4); }
         .btn-pdf:disabled, .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
         .candidate-row {
-            background: rgba(45, 45, 45, 0.45);
-            border-right: 4px solid #E91E63;
-            border-radius: 12px; padding: 14px;
-            transition: background 0.2s ease;
+            background: rgba(45, 45, 45, 0.45); border-right: 4px solid #E91E63;
+            border-radius: 12px; padding: 14px; transition: background 0.2s ease;
         }
         .candidate-row:hover { background: rgba(45, 45, 45, 0.7); }
         .site-credit {
@@ -65,18 +55,91 @@
             animation: spin .8s linear infinite; display: inline-block; vertical-align: -3px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @media screen and (max-width: 768px) {
-            input, select, button { font-size: 16px !important; }
-        }
-        /* Gabarit PDF — hors flux, largeur fixe 800px */
-        #pdfTemplate {
+        @media screen and (max-width: 768px) { input, select, button { font-size: 16px !important; } }
+
+        /* ═══════════════════════════════════════════════════════
+           GABARIT PDF — page A4 exacte : 794 × 1123 px (ratio 1.414)
+           Hauteur FIXE + flex : le contenu ne peut pas déborder,
+           donc jamais de 2e page ni de mise à l'échelle.
+           ═══════════════════════════════════════════════════════ */
+        #pdfPage {
             position: fixed; left: -9999px; top: 0;
-            width: 800px; max-width: none;
-            background: white; color: #1A1A1A;
+            width: 794px; height: 1123px;
+            background: #fff; color: #1A1A1A;
             font-family: 'Cairo', sans-serif; direction: rtl;
-            padding: 40px; box-sizing: border-box;
-            z-index: -9999; pointer-events: none;
+            padding: 30px 34px; box-sizing: border-box;
+            display: flex; flex-direction: column;
+            z-index: -9999; pointer-events: none; overflow: hidden;
         }
+
+        #pdfPage .head {
+            background: linear-gradient(135deg, #E91E63, #AD1457);
+            border-radius: 14px; padding: 16px 22px;
+            display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+        }
+        #pdfPage .head .logo {
+            width: 58px; height: 58px; border-radius: 50%;
+            background: rgba(255,255,255,.18);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        #pdfPage .head .logo svg { width: 32px; height: 32px; fill: #fff; }
+        #pdfPage .head .t { flex: 1; text-align: center; }
+        #pdfPage .head h1 { color: #fff; font-size: 17px; font-weight: 800; line-height: 1.45; }
+        #pdfPage .head .sub { color: #FBD0E0; font-size: 11.5px; margin-top: 4px; letter-spacing: .3px; }
+
+        #pdfPage .band {
+            margin-top: 12px; background: #FDF2F6;
+            border-radius: 10px; padding: 9px 16px; flex-shrink: 0;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 12px; color: #9A5570; font-weight: 600;
+        }
+        #pdfPage .band b { color: #C2185B; }
+
+        #pdfPage .body { flex: 1; padding-top: 16px; overflow: hidden; }
+
+        #pdfPage .sec { margin-bottom: 15px; }
+        #pdfPage .sec > h2 {
+            font-size: 13.5px; font-weight: 800; color: #C2185B;
+            display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
+        }
+        #pdfPage .sec > h2::before {
+            content: ''; width: 4px; height: 15px; background: #E91E63;
+            border-radius: 2px; flex-shrink: 0;
+        }
+        #pdfPage .sec > h2::after { content: ''; flex: 1; height: 1px; background: #F3D7E2; }
+        #pdfPage table { width: 100%; border-collapse: collapse; }
+        #pdfPage td { padding: 7px 6px; font-size: 13px; border-bottom: 1px solid #F2F2F2; vertical-align: top; }
+        #pdfPage td.k { color: #8A8A8A; width: 16%; white-space: nowrap; font-size: 12px; }
+        #pdfPage td.v { color: #1A1A1A; font-weight: 700; width: 34%; word-break: break-word; }
+        #pdfPage td.vw { color: #1A1A1A; font-weight: 700; width: 84%; word-break: break-word; }
+
+        #pdfPage .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        #pdfPage .chip {
+            background: #FCE4EC; color: #C2185B; border-radius: 20px;
+            padding: 3px 12px; font-size: 11.5px; font-weight: 700;
+        }
+        #pdfPage .quote {
+            background: #FAFAFA; border-right: 3px solid #E91E63; border-radius: 0 8px 8px 0;
+            padding: 9px 12px; font-size: 12.5px; line-height: 1.7; color: #333;
+            max-height: 82px; overflow: hidden;
+        }
+
+        #pdfPage .foot { flex-shrink: 0; }
+        #pdfPage .confirm {
+            background: #FCE4EC; border-radius: 9px; padding: 10px 14px;
+            color: #C2185B; font-weight: 700; font-size: 11.5px; line-height: 1.6;
+            margin-bottom: 14px;
+        }
+        #pdfPage .signs { display: flex; gap: 20px; margin-bottom: 14px; }
+        #pdfPage .signs > div {
+            flex: 1; border: 1px dashed #D8D8D8; border-radius: 9px;
+            height: 88px; padding: 8px; text-align: center;
+            color: #9A9A9A; font-size: 11.5px; font-weight: 600;
+        }
+        #pdfPage .credit { text-align: center; border-top: 2px solid #F3D7E2; padding-top: 11px; }
+        #pdfPage .credit .c1 { color: #999; font-size: 10px; }
+        #pdfPage .credit .c2 { color: #E91E63; font-size: 14px; font-weight: 800; margin-top: 1px; }
+        #pdfPage .credit .c3 { color: #B5B5B5; font-size: 9px; margin-top: 2px; }
     </style>
 </head>
 <body class="p-2 sm:p-4 md:p-6">
@@ -88,24 +151,18 @@
             <p class="text-sm text-gray-400">منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</p>
         </div>
 
-        <!-- Accès -->
         <div id="authBox" class="bg-gray-800/40 rounded-xl p-4 mb-5">
             <label class="block text-sm text-pink-300 font-semibold mb-2">كلمة سر اللوحة</label>
             <div class="flex flex-col sm:flex-row gap-3">
                 <input type="password" id="adminKey" class="input-field rounded-xl px-4 py-3" placeholder="أدخل كلمة السر">
-                <button id="loadBtn" onclick="loadCandidates()" class="btn-primary px-6 py-3 rounded-xl font-bold whitespace-nowrap">
-                    تحميل اللائحة
-                </button>
+                <button id="loadBtn" onclick="loadCandidates()" class="btn-primary px-6 py-3 rounded-xl font-bold whitespace-nowrap">تحميل اللائحة</button>
             </div>
             <p id="statusMsg" class="text-sm mt-3 text-gray-400"></p>
         </div>
 
-        <!-- Barre d'outils -->
         <div id="toolbar" class="hidden flex-col sm:flex-row gap-3 mb-4">
             <input type="search" id="searchBox" oninput="renderList()" class="input-field rounded-xl px-4 py-3" placeholder="بحث بالاسم، الهاتف، البطاقة الوطنية، المدينة...">
-            <button onclick="downloadAll()" id="allBtn" class="btn-pdf px-5 py-3 rounded-xl font-bold whitespace-nowrap">
-                تحميل جميع الملفات PDF
-            </button>
+            <button onclick="downloadAll()" id="allBtn" class="btn-pdf px-5 py-3 rounded-xl font-bold whitespace-nowrap">تحميل جميع الملفات PDF</button>
         </div>
 
         <p id="countMsg" class="text-sm text-gray-400 mb-3 hidden"></p>
@@ -118,54 +175,51 @@
         <p>Conçu par Mohamed Elfellaq</p>
     </footer>
 
-    <!-- Gabarit PDF (rempli à la volée pour chaque candidat) -->
-    <div id="pdfTemplate" aria-hidden="true">
-        <div class="pdf-keep" style="background: linear-gradient(135deg, #E91E63, #C2185B); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
-            <h1 style="color: white; font-size: 28px; margin-bottom: 10px; font-weight: 800;">منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</h1>
-            <h2 style="color: #FCE4EC; font-size: 20px; margin-bottom: 5px;">ISTIQLAL PARTY</h2>
-            <p style="color: white; font-size: 18px; margin-top: 15px;">استمارة انخراط الشبيبة الاستقلالية</p>
-            <p style="color: #FCE4EC; font-size: 14px; margin-top: 10px;">Formulaire d'adhésion - Jeunesse Istiqlalienne</p>
+    <!-- ═══ Page A4 (794 × 1123) ═══ -->
+    <div id="pdfPage" aria-hidden="true">
+        <div class="head">
+            <div class="logo">
+                <svg viewBox="0 0 24 24"><path d="M12 2C12.55 2 13 2.45 13 3V6H19C19.55 6 20 6.45 20 7C20 7.55 19.55 8 19 8H17V14H20C20.55 14 21 14.45 21 15C21 15.55 20.55 16 20 16H4C3.45 16 3 15.55 3 15C3 14.45 3.45 14 4 14H7V8H5C4.45 8 4 7.55 4 7C4 6.45 4.45 6 5 6H11V3C11 2.45 11.45 2 12 2M7 8V14H17V8H7M9 18H11V22H9V18M13 18H15V22H13V18Z"/></svg>
+            </div>
+            <div class="t">
+                <h1>منظمة الشبيبة الاستقلالية<br>بالجهة الداخلة وادي الذهب</h1>
+                <p class="sub">استمارة انخراط · Formulaire d'adhésion</p>
+            </div>
+            <div class="logo">
+                <svg viewBox="0 0 24 24"><path d="M12 2C12.55 2 13 2.45 13 3V6H19C19.55 6 20 6.45 20 7C20 7.55 19.55 8 19 8H17V14H20C20.55 14 21 14.45 21 15C21 15.55 20.55 16 20 16H4C3.45 16 3 15.55 3 15C3 14.45 3.45 14 4 14H7V8H5C4.45 8 4 7.55 4 7C4 6.45 4.45 6 5 6H11V3C11 2.45 11.45 2 12 2M7 8V14H17V8H7M9 18H11V22H9V18M13 18H15V22H13V18Z"/></svg>
+            </div>
         </div>
-        <div style="text-align: left; margin-bottom: 20px; color: #666; font-size: 14px;">
-            <strong>تاريخ التسجيل:</strong> <span id="pdfDate"></span>
+
+        <div class="band">
+            <span>المرجع: <b id="pdfRef"></b></span>
+            <span>تاريخ التسجيل: <b id="pdfDate"></b></span>
         </div>
-        <div id="pdfContent"></div>
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 3px solid #E91E63;">
-            <div class="pdf-keep" style="background: #FCE4EC; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <p style="color: #C2185B; font-weight: bold; font-size: 16px;">✓ تم تأكيد صحة المعلومات والالتزام بقوانين منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</p>
+
+        <div class="body" id="pdfBody"></div>
+
+        <div class="foot">
+            <div class="confirm">✓ يشهد الموقع أدناه على صحة جميع المعلومات الواردة أعلاه، ويلتزم بقوانين وأنظمة منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب.</div>
+            <div class="signs">
+                <div>توقيع المنخرط(ة)</div>
+                <div>توقيع وخاتم المنظمة</div>
             </div>
-            <div class="pdf-keep" style="display: flex; justify-content: space-between; gap: 20px; margin: 25px 0;">
-                <div style="flex: 1; text-align: center; border: 1px dashed #ccc; border-radius: 8px; padding: 12px; min-height: 90px;">
-                    <p style="color: #666; font-size: 13px;">توقيع المنخرط(ة)</p>
-                </div>
-                <div style="flex: 1; text-align: center; border: 1px dashed #ccc; border-radius: 8px; padding: 12px; min-height: 90px;">
-                    <p style="color: #666; font-size: 13px;">توقيع وخاتم المنظمة</p>
-                </div>
-            </div>
-            <div class="pdf-keep" style="text-align: center; margin: 25px 0; padding: 15px; border-top: 1px solid #ddd;">
-                <p style="color: #666; font-size: 14px; margin-bottom: 5px;">تم التصميم بواسطة</p>
-                <p style="color: #E91E63; font-size: 18px; font-weight: bold;">محمد الفلاق</p>
-                <p style="color: #999; font-size: 12px; margin-top: 5px;">Conçu par Mohamed Elfellaq</p>
-            </div>
-            <p style="color: #999; font-size: 12px; text-align: center;">منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب - المغرب</p>
         </div>
     </div>
 
     <script>
-        // ⚠️ Même déploiement Apps Script que le formulaire, mais il faut y ajouter un doGet (voir apps-script.gs)
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztMKRcMm764mP3Ryk7o7n1_8-hgV_VJQ4gcPll5e7QTYLP7hHmqGxye2RL5czV6T5e/exec';
 
         let candidates = [];
 
-        // Dictionnaires : codes stockés → libellés arabes
-        const MAP_EDU = { college:'إعدادي', lycee:'ثانوي', licence:'إجازة', master:'ماستر', doctorat:'دكتوراه' };
+        const MAP_EDU = { college:'إعدادي', lycee:'ثانوي', bac:'باكالوريا', bac2:'باك + 2', licence:'إجازة', master:'ماستر', doctorat:'دكتوراه',
+                          BAC:'باكالوريا', 'BAC 2':'باك + 2' };
         const MAP_JOB = { student:'طالب/ة', employee:'موظف/ة', 'self-employed':'عامل/ة حر/ة', unemployed:'باحث/ة عن عمل' };
-        const MAP_POS = { membre:'عضو بسيط', responsable:'مسؤول محلي', coordinateur:'منسق', animateur:'منشط' };
+        const MAP_POS = { membre:'عضو', animateur:'منشط', coordinateur:'منسق', responsable:'مسؤول محلي' };
         const MAP_INT = { social:'الشأن الاجتماعي', economic:'الشأن الاقتصادي', cultural:'الشأن الثقافي', youth:'شؤون الشباب' };
 
-        const val = v => (v === null || v === undefined || String(v).trim() === '') ? '-' : String(v);
+        const val = v => (v === null || v === undefined || String(v).trim() === '') ? '—' : String(v).trim();
         const lbl = (map, v) => map[String(v || '').trim()] || val(v);
-        const lblList = (map, v) => String(v || '').split(',').map(s => s.trim()).filter(Boolean).map(s => map[s] || s).join('، ') || '-';
+        const arr = v => String(v || '').split(',').map(s => s.trim()).filter(Boolean);
         const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
         function setStatus(msg, color) {
@@ -174,7 +228,6 @@
             el.className = 'text-sm mt-3 ' + (color || 'text-gray-400');
         }
 
-        // JSONP : contourne les redirections CORS d'Apps Script
         function jsonp(url, timeoutMs) {
             return new Promise((resolve, reject) => {
                 const cbName = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
@@ -185,7 +238,7 @@
                     delete window[cbName];
                     if (script.parentNode) script.parentNode.removeChild(script);
                 }
-                window[cbName] = (data) => { cleanup(); resolve(data); };
+                window[cbName] = d => { cleanup(); resolve(d); };
                 script.onerror = () => { cleanup(); reject(new Error('تعذر الاتصال بالخادم')); };
                 script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + 'callback=' + cbName;
                 document.body.appendChild(script);
@@ -198,7 +251,6 @@
             const btn = document.getElementById('loadBtn');
             btn.disabled = true;
             setStatus('<span class="spinner-sm"></span> جاري التحميل...', 'text-gray-300');
-
             try {
                 const res = await jsonp(SCRIPT_URL + '?action=list&key=' + encodeURIComponent(key));
                 if (!res || res.ok !== true) throw new Error((res && res.error) || 'كلمة السر غير صحيحة');
@@ -220,26 +272,20 @@
             if (!q) return candidates;
             return candidates.filter(c =>
                 [c.fullname, c.phone, c.cin, c.email, c.city, c.region]
-                    .map(x => String(x || '').toLowerCase()).join(' ').includes(q)
-            );
+                    .map(x => String(x || '').toLowerCase()).join(' ').includes(q));
         }
 
         function renderList() {
             const rows = filtered();
             document.getElementById('countMsg').textContent = 'عدد المنخرطين: ' + rows.length + ' من أصل ' + candidates.length;
             const list = document.getElementById('list');
-            if (!rows.length) {
-                list.innerHTML = '<p class="text-center text-gray-500 py-8">لا توجد نتائج</p>';
-                return;
-            }
+            if (!rows.length) { list.innerHTML = '<p class="text-center text-gray-500 py-8">لا توجد نتائج</p>'; return; }
             list.innerHTML = rows.map(c => {
                 const i = candidates.indexOf(c);
                 return '<div class="candidate-row flex flex-col sm:flex-row sm:items-center gap-3">' +
                     '<div class="flex-1 min-w-0">' +
                         '<p class="font-bold text-pink-300 truncate">' + esc(val(c.fullname)) + '</p>' +
-                        '<p class="text-xs text-gray-400 mt-1">' +
-                            esc(val(c.phone)) + ' · ' + esc(val(c.cin)) + ' · ' + esc(val(c.city)) +
-                        '</p>' +
+                        '<p class="text-xs text-gray-400 mt-1">' + esc(val(c.phone)) + ' · ' + esc(val(c.cin)) + ' · ' + esc(val(c.city)) + '</p>' +
                         '<p class="text-xs text-gray-500 mt-0.5">' + esc(lbl(MAP_POS, c.position)) + ' — ' + esc(val(c.timestamp)) + '</p>' +
                     '</div>' +
                     '<button onclick="downloadOne(' + i + ', this)" class="btn-pdf px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap">تحميل PDF</button>' +
@@ -247,120 +293,65 @@
             }).join('');
         }
 
-        function buildPdfContent(c) {
-            const row = (k, v, top) =>
-                '<tr><td style="padding:10px;border-bottom:1px solid #eee;color:#666;width:35%;' + (top ? 'vertical-align:top;' : '') + '"><strong>' + k + '</strong></td>' +
-                '<td style="padding:10px;border-bottom:1px solid #eee;font-weight:bold;word-break:break-word;">' + esc(v) + '</td></tr>';
-            const block = (icon, title, rows) =>
-                '<div class="pdf-block" style="margin-bottom:25px;">' +
-                    '<h3 class="pdf-keep" style="color:#E91E63;font-size:22px;margin-bottom:15px;border-right:5px solid #E91E63;padding-right:15px;">' + icon + ' ' + title + '</h3>' +
-                    '<table style="width:100%;border-collapse:collapse;">' + rows + '</table>' +
-                '</div>';
+        // ── Remplissage de la page A4 ──
+        function fillPage(c) {
+            const r2 = (k1, v1, k2, v2) =>
+                '<tr><td class="k">' + k1 + '</td><td class="v">' + esc(v1) + '</td>' +
+                    '<td class="k">' + k2 + '</td><td class="v">' + esc(v2) + '</td></tr>';
+            const r1 = (k, v) =>
+                '<tr><td class="k">' + k + '</td><td class="vw" colspan="3">' + esc(v) + '</td></tr>';
+            const sec = (title, inner) => '<div class="sec"><h2>' + title + '</h2>' + inner + '</div>';
+            const tbl = rows => '<table>' + rows + '</table>';
 
-            return block('📋', 'المعلومات الشخصية',
-                    row('الاسم الكامل:', val(c.fullname)) +
-                    row('تاريخ الازدياد:', val(c.birthdate)) +
-                    row('مكان الازدياد:', val(c.birthplace)) +
-                    row('العنوان:', val(c.address)) +
-                    row('المدينة:', val(c.city)) +
-                    row('الجهة:', val(c.region))
-                ) +
-                block('📞', 'معلومات الاتصال',
-                    row('رقم الهاتف:', val(c.phone)) +
-                    row('البريد الإلكتروني:', val(c.email)) +
-                    row('رقم البطاقة الوطنية:', val(c.cin))
-                ) +
-                block('💼', 'المعلومات المهنية والدراسية',
-                    row('المستوى الدراسي:', lbl(MAP_EDU, c.education)) +
-                    row('التخصص:', val(c.specialty)) +
-                    row('الوضعية المهنية:', lbl(MAP_JOB, c.jobStatus)) +
-                    row('المهنة:', val(c.profession))
-                ) +
-                block('🎯', 'المعلومات الحزبية',
-                    row('الصفة المطلوبة:', lbl(MAP_POS, c.position)) +
-                    row('الدوافع:', val(c.motivation), true) +
-                    row('المجالات:', lblList(MAP_INT, c.interests), true)
-                );
-        }
+            const chips = arr(c.interests).map(s => '<span class="chip">' + esc(MAP_INT[s] || s) + '</span>').join('');
 
-        async function makePdf(c) {
-            const template = document.getElementById('pdfTemplate');
+            document.getElementById('pdfRef').textContent = val(c.cin) !== '—' ? c.cin : val(c.phone);
             document.getElementById('pdfDate').textContent = c.timestamp
                 ? String(c.timestamp)
                 : new Date().toLocaleDateString('ar-MA', { year:'numeric', month:'long', day:'numeric' });
-            document.getElementById('pdfContent').innerHTML = buildPdfContent(c);
 
-            // html2canvas gère mal position:fixed → bascule temporaire
-            template.style.position = 'absolute';
-            template.style.left = '0';
-            template.style.top = '0';
+            document.getElementById('pdfBody').innerHTML =
+                sec('المعلومات الشخصية', tbl(
+                    r2('الاسم الكامل:', val(c.fullname), 'البطاقة الوطنية:', val(c.cin)) +
+                    r2('تاريخ الازدياد:', val(c.birthdate), 'مكان الازدياد:', val(c.birthplace)) +
+                    r2('المدينة:', val(c.city), 'الجهة:', val(c.region)) +
+                    r1('العنوان:', val(c.address))
+                )) +
+                sec('معلومات الاتصال', tbl(
+                    r2('الهاتف:', val(c.phone), 'البريد الإلكتروني:', val(c.email))
+                )) +
+                sec('المعلومات المهنية والدراسية', tbl(
+                    r2('المستوى الدراسي:', lbl(MAP_EDU, c.education), 'التخصص:', val(c.specialty)) +
+                    r2('الوضعية المهنية:', lbl(MAP_JOB, c.jobStatus), 'المهنة:', val(c.profession))
+                )) +
+                sec('المعلومات الحزبية',
+                    tbl(r1('الصفة المطلوبة:', lbl(MAP_POS, c.position))) +
+                    (chips ? '<div style="margin-top:9px"><p style="font-size:12px;color:#8A8A8A;margin-bottom:5px">المجالات المهتم بها:</p><div class="chips">' + chips + '</div></div>' : '') +
+                    (val(c.motivation) !== '—' ? '<div style="margin-top:10px"><p style="font-size:12px;color:#8A8A8A;margin-bottom:5px">الدوافع:</p><div class="quote">' + esc(c.motivation) + '</div></div>' : '')
+                );
+        }
+
+        // ── Génération : la page fait déjà exactement un A4 ──
+        async function makePdf(c) {
+            const page = document.getElementById('pdfPage');
+            fillPage(c);
+            page.style.position = 'absolute';
+            page.style.left = '0';
+            page.style.top = '0';
             try {
-                // 1) Points de coupe sûrs : bas de chaque ligne, haut/bas de chaque bloc insécable
-                const tTop = template.getBoundingClientRect().top;
-                const cssCuts = [];
-                template.querySelectorAll('tr, .pdf-block, .pdf-keep').forEach(el => {
-                    const r = el.getBoundingClientRect();
-                    cssCuts.push(r.top - tTop);
-                    cssCuts.push(r.bottom - tTop);
+                const canvas = await html2canvas(page, {
+                    scale: 2.5, useCORS: true, logging: false,
+                    backgroundColor: '#ffffff',
+                    width: 794, height: 1123, windowWidth: 900
                 });
-
-                const canvas = await html2canvas(template, {
-                    scale: 2, useCORS: true, logging: false,
-                    backgroundColor: '#ffffff', width: 800, windowWidth: 900
-                });
-
-                // 2) Conversion px CSS → px canvas
-                const k = canvas.width / template.offsetWidth;
-                const cuts = cssCuts.map(v => v * k).filter(v => v > 0 && v < canvas.height);
-                cuts.push(canvas.height);
-                cuts.sort((a, b) => a - b);
-
-                // 3) Géométrie de la page
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const marginMm = 8;
-                const contentWmm = 210 - 2 * marginMm;
-                const contentHmm = 297 - 2 * marginMm;
-                const pxPerMm = canvas.width / contentWmm;
-                const pageSlicePx = contentHmm * pxPerMm;
-
-                // 4) Découpe : on ne coupe jamais au milieu d'une ligne
-                const slice = document.createElement('canvas');
-                const ctx = slice.getContext('2d');
-                let y = 0, first = true;
-
-                while (y < canvas.height - 2) {
-                    const target = y + pageSlicePx;
-                    let cut;
-                    if (target >= canvas.height) {
-                        cut = canvas.height;
-                    } else {
-                        cut = 0;
-                        for (let i = 0; i < cuts.length; i++) {
-                            if (cuts[i] > y + pageSlicePx * 0.25 && cuts[i] <= target) cut = cuts[i];
-                        }
-                        if (!cut) cut = target; // aucun point sûr → coupe brute (bloc plus haut qu'une page)
-                    }
-
-                    const h = Math.max(1, Math.round(cut - y));
-                    slice.width = canvas.width;
-                    slice.height = h;
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, slice.width, slice.height);
-                    ctx.drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
-
-                    if (!first) pdf.addPage();
-                    first = false;
-                    pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG',
-                                 marginMm, marginMm, contentWmm, h / pxPerMm);
-                    y = cut;
-                }
-
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
                 const safeName = String(c.fullname || 'منخرط').replace(/[\\/:*?"<>|]/g, '_').trim();
                 pdf.save('انخراط_' + safeName + '.pdf');
             } finally {
-                template.style.position = 'fixed';
-                template.style.left = '-9999px';
+                page.style.position = 'fixed';
+                page.style.left = '-9999px';
             }
         }
 
@@ -370,16 +361,9 @@
             const original = btn.textContent;
             btn.disabled = true;
             btn.textContent = 'جاري الإنشاء...';
-            try {
-                await makePdf(c);
-                btn.textContent = '✓ تم';
-            } catch (e) {
-                console.error(e);
-                alert('خطأ أثناء إنشاء PDF: ' + e.message);
-                btn.textContent = original;
-            } finally {
-                setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2000);
-            }
+            try { await makePdf(c); btn.textContent = '✓ تم'; }
+            catch (e) { console.error(e); alert('خطأ أثناء إنشاء PDF: ' + e.message); btn.textContent = original; }
+            finally { setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2000); }
         }
 
         async function downloadAll() {
@@ -391,12 +375,9 @@
             btn.disabled = true;
             for (let i = 0; i < rows.length; i++) {
                 btn.textContent = 'جاري... ' + (i + 1) + '/' + rows.length;
-                try {
-                    await makePdf(rows[i]);
-                } catch (e) {
-                    console.error('PDF échoué pour', rows[i].fullname, e);
-                }
-                await new Promise(r => setTimeout(r, 700)); // évite le blocage des téléchargements multiples
+                try { await makePdf(rows[i]); }
+                catch (e) { console.error('PDF échoué :', rows[i].fullname, e); }
+                await new Promise(r => setTimeout(r, 700));
             }
             btn.textContent = '✓ انتهى';
             setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2500);
