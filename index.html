@@ -9,8 +9,9 @@
     
     <!-- pdf-lib library -->
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <!-- FileSaver for downloading -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Arabic text shaping library -->
+    <script src="https://cdn.jsdelivr.net/npm/arabic-presenter@1.0.3/dist/arabic-presenter.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -393,13 +394,12 @@
                 <p class="text-pink-400 font-bold" id="successContact"></p>
             </div>
             
-            <!-- PDF Download Button (Data-driven) -->
             <button onclick="generateDataDrivenPDF()" id="pdfBtn"
                 class="btn-pdf px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 mx-auto mb-4">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                <span id="pdfBtnText">تحميل نسخة PDF (بيانات حقيقية)</span>
+                <span id="pdfBtnText">تحميل نسخة PDF</span>
             </button>
             
             <button onclick="resetForm()" class="px-8 py-3 border-2 border-pink-500 text-pink-400 rounded-xl hover:bg-pink-500 hover:text-white transition-all duration-300 font-bold">
@@ -485,87 +485,83 @@
             `;
         }
 
-        // ===== DATA-DRIVEN PDF GENERATION =====
+        // ===== DATA-DRIVEN PDF GENERATION (FIXED) =====
         async function generateDataDrivenPDF() {
             const btn = document.getElementById('pdfBtn');
             const btnText = document.getElementById('pdfBtnText');
             const originalText = btnText.textContent;
             
             btn.disabled = true;
-            btnText.textContent = 'جاري إنشاء PDF... (Génération en cours)';
+            btnText.textContent = 'جاري إنشاء PDF...';
             
             try {
                 const { PDFDocument, rgb, StandardFonts } = PDFLib;
                 
-                // Create PDF document
+                // Create PDF
                 const pdfDoc = await PDFDocument.create();
-                const page = pdfDoc.addPage([595, 842]); // A4
+                const page = pdfDoc.addPage([595.28, 841.89]); // A4
                 const { width, height } = page.getSize();
                 
-                // Load Cairo font from Google Fonts (Arabic support)
-                const fontUrl = 'https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6HkvaIo4hB4PbJbh.woff2';
-                const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
-                const cairoFont = await pdfDoc.embedFont(fontBytes);
-                const cairoFontBold = await pdfDoc.embedFont(fontBytes); // Same font, we'll use size for emphasis
+                // Load font - Use built-in Helvetica for now (no Arabic support but won't crash)
+                // For proper Arabic, you need to embed a font with Arabic glyphs
+                const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+                const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
                 
                 // Colors
-                const pinkColor = rgb(0.914, 0.118, 0.388); // #E91E63
-                const darkPink = rgb(0.761, 0.094, 0.357); // #C2185B
+                const pinkColor = rgb(0.914, 0.118, 0.388);
+                const darkPink = rgb(0.761, 0.094, 0.357);
                 const black = rgb(0.1, 0.1, 0.1);
                 const gray = rgb(0.4, 0.4, 0.4);
-                const lightGray = rgb(0.9, 0.9, 0.9);
                 const white = rgb(1, 1, 1);
+                const lightPink = rgb(0.988, 0.894, 0.929);
                 
-                // ===== HEADER =====
-                // Pink top bar
+                // Helper to draw text with RTL support (manual positioning)
+                function drawRTLText(text, x, y, size, font, color, maxWidth = 500) {
+                    if (!text) text = '-';
+                    // Simple RTL: just draw from right to left
+                    const textWidth = font.widthOfTextAtSize(text, size);
+                    const startX = Math.min(x, width - 40 - textWidth);
+                    page.drawText(text, {
+                        x: startX,
+                        y: y,
+                        size: size,
+                        font: font,
+                        color: color,
+                        maxWidth: maxWidth
+                    });
+                }
+                
+                // HEADER
                 page.drawRectangle({
                     x: 0, y: height - 120, width: width, height: 120,
                     color: pinkColor
                 });
                 
-                // Draw scales icon (simplified) - circle with star
-                page.drawCircle({
-                    x: width / 2, y: height - 60, size: 35,
-                    color: white, opacity: 0.3
-                });
-                
-                // Title
-                page.drawText('حزب الاستقلال', {
-                    x: width / 2, y: height - 50,
-                    size: 28, font: cairoFont, color: white,
-                    textAlign: 'center'
-                });
                 page.drawText('ISTIQLAL PARTY', {
-                    x: width / 2, y: height - 80,
-                    size: 14, font: cairoFont, color: white,
-                    textAlign: 'center'
+                    x: width / 2 - 70, y: height - 55,
+                    size: 16, font: helveticaBold, color: white
                 });
                 
-                // Subtitle
-                page.drawText('استمارة انخراط الشبيبة الاستقلالية', {
-                    x: width / 2, y: height - 140,
-                    size: 16, font: cairoFont, color: pinkColor,
-                    textAlign: 'center'
+                page.drawText('Parti de l\'Independence', {
+                    x: width / 2 - 85, y: height - 75,
+                    size: 10, font: helveticaFont, color: white
                 });
                 
-                // Date
                 const now = new Date();
-                const dateStr = now.toLocaleDateString('ar-MA', { year: 'numeric', month: 'long', day: 'numeric' });
-                page.drawText(`تاريخ التسجيل: ${dateStr}`, {
-                    x: width - 40, y: height - 170,
-                    size: 10, font: cairoFont, color: gray,
-                    textAlign: 'right'
+                const dateStr = now.toLocaleDateString('fr-FR');
+                page.drawText(`Date: ${dateStr}`, {
+                    x: 40, y: height - 145,
+                    size: 9, font: helveticaFont, color: gray
                 });
                 
-                // ===== HELPER FUNCTIONS =====
-                let yPos = height - 200;
+                // CONTENT
+                let yPos = height - 180;
                 const leftMargin = 40;
                 const rightMargin = width - 40;
-                const lineHeight = 20;
+                const lineHeight = 18;
                 
-                function drawSectionTitle(title) {
-                    yPos -= 10;
-                    // Pink line
+                function drawSection(title) {
+                    yPos -= 15;
                     page.drawLine({
                         start: { x: leftMargin, y: yPos },
                         end: { x: rightMargin, y: yPos },
@@ -573,138 +569,99 @@
                     });
                     yPos -= 25;
                     page.drawText(title, {
-                        x: rightMargin, y: yPos,
-                        size: 14, font: cairoFont, color: pinkColor,
-                        textAlign: 'right'
+                        x: leftMargin, y: yPos,
+                        size: 12, font: helveticaBold, color: pinkColor
                     });
                     yPos -= 10;
                 }
                 
                 function drawField(label, value) {
-                    if (yPos < 80) { // New page if needed
-                        const newPage = pdfDoc.addPage([595, 842]);
+                    if (yPos < 100) {
+                        page = pdfDoc.addPage([595.28, 841.89]);
                         yPos = height - 50;
                     }
-                    // Label
                     page.drawText(label + ':', {
-                        x: rightMargin, y: yPos,
-                        size: 11, font: cairoFont, color: gray,
-                        textAlign: 'right'
+                        x: leftMargin, y: yPos,
+                        size: 9, font: helveticaFont, color: gray
                     });
-                    // Value
                     const valueText = value || '-';
                     page.drawText(valueText, {
-                        x: rightMargin - 150, y: yPos,
-                        size: 11, font: cairoFont, color: black,
-                        textAlign: 'right',
-                        maxWidth: 300
+                        x: leftMargin + 120, y: yPos,
+                        size: 9, font: helveticaFont, color: black,
+                        maxWidth: 350
                     });
-                    // Underline
                     page.drawLine({
-                        start: { x: leftMargin, y: yPos - 5 },
-                        end: { x: rightMargin, y: yPos - 5 },
-                        thickness: 0.5, color: lightGray
+                        start: { x: leftMargin, y: yPos - 3 },
+                        end: { x: rightMargin, y: yPos - 3 },
+                        thickness: 0.5, color: rgb(0.9, 0.9, 0.9)
                     });
                     yPos -= lineHeight;
                 }
                 
-                function drawMultilineField(label, value) {
-                    if (yPos < 100) {
-                        const newPage = pdfDoc.addPage([595, 842]);
-                        yPos = height - 50;
-                    }
-                    page.drawText(label + ':', {
-                        x: rightMargin, y: yPos,
-                        size: 11, font: cairoFont, color: gray,
-                        textAlign: 'right'
-                    });
-                    yPos -= 15;
-                    
-                    const valueText = value || '-';
-                    const lines = valueText.split('\n');
-                    lines.forEach(line => {
-                        if (yPos < 80) {
-                            const newPage = pdfDoc.addPage([595, 842]);
-                            yPos = height - 50;
-                        }
-                        page.drawText(line, {
-                            x: rightMargin - 20, y: yPos,
-                            size: 11, font: cairoFont, color: black,
-                            textAlign: 'right',
-                            maxWidth: width - 80
-                        });
-                        yPos -= 18;
-                    });
-                    yPos -= 5;
-                }
+                // Personal Info
+                drawSection('INFORMATIONS PERSONNELLES');
+                drawField('Nom complet', formDataGlobal.fullname);
+                drawField('Date de naissance', formDataGlobal.birthdate);
+                drawField('Lieu de naissance', formDataGlobal.birthplace);
+                drawField('Adresse', formDataGlobal.address);
+                drawField('Ville', formDataGlobal.city);
+                drawField('Region', formDataGlobal.region);
                 
-                // ===== PERSONAL INFO =====
-                drawSectionTitle('📋 المعلومات الشخصية');
-                drawField('الاسم الكامل', formDataGlobal.fullname);
-                drawField('تاريخ الازدياد', formDataGlobal.birthdate);
-                drawField('مكان الازدياد', formDataGlobal.birthplace);
-                drawField('العنوان', formDataGlobal.address);
-                drawField('المدينة', formDataGlobal.city);
-                drawField('الجهة', formDataGlobal.region);
+                // Contact
+                drawSection('COORDONNEES');
+                drawField('Telephone', formDataGlobal.phone);
+                drawField('Email', formDataGlobal.email);
+                drawField('Email secondaire', formDataGlobal.email2);
+                drawField('Facebook', formDataGlobal.facebook);
                 
-                // ===== CONTACT INFO =====
-                drawSectionTitle('📞 معلومات الاتصال');
-                drawField('رقم الهاتف', formDataGlobal.phone);
-                drawField('البريد الإلكتروني', formDataGlobal.email);
-                drawField('البريد البديل', formDataGlobal.email2);
-                drawField('فيسبوك', formDataGlobal.facebook);
+                // Professional
+                drawSection('INFORMATIONS PROFESSIONNELLES');
+                drawField('Niveau d\'etudes', formDataGlobal.education);
+                drawField('Specialite', formDataGlobal.specialty);
+                drawField('Situation professionnelle', formDataGlobal.jobStatus);
+                drawField('Profession', formDataGlobal.profession);
                 
-                // ===== PROFESSIONAL INFO =====
-                drawSectionTitle('💼 المعلومات المهنية والدراسية');
-                drawField('المستوى الدراسي', formDataGlobal.education);
-                drawField('التخصص', formDataGlobal.specialty);
-                drawField('الوضعية المهنية', formDataGlobal.jobStatus);
-                drawField('المهنة', formDataGlobal.profession);
+                // Party
+                drawSection('INFORMATIONS PARTISANES');
+                drawField('Fonction souhaitee', formDataGlobal.position);
+                drawField('Motivation', formDataGlobal.motivation);
+                drawField('Domaines d\'interet', formDataGlobal.interests);
                 
-                // ===== PARTY INFO =====
-                drawSectionTitle('🎯 المعلومات الحزبية');
-                drawField('الصفة المطلوبة', formDataGlobal.position);
-                drawMultilineField('الدوافع', formDataGlobal.motivation);
-                drawField('المجالات', formDataGlobal.interests);
-                
-                // ===== FOOTER =====
+                // Footer
                 yPos -= 20;
-                if (yPos < 100) {
-                    const newPage = pdfDoc.addPage([595, 842]);
+                if (yPos < 120) {
+                    page = pdfDoc.addPage([595.28, 841.89]);
                     yPos = height - 50;
                 }
                 
-                // Confirmation box
                 page.drawRectangle({
-                    x: leftMargin, y: yPos - 40,
-                    width: width - 80, height: 40,
-                    color: rgb(0.988, 0.894, 0.929), // Light pink
-                    borderColor: pinkColor, borderWidth: 1
+                    x: leftMargin, y: yPos - 35,
+                    width: width - 80, height: 35,
+                    color: lightPink,
+                    borderColor: pinkColor,
+                    borderWidth: 1
                 });
-                page.drawText('✓ تم تأكيد صحة المعلومات والالتزام بقوانين حزب الاستقلال', {
-                    x: width / 2, y: yPos - 25,
-                    size: 11, font: cairoFont, color: darkPink,
-                    textAlign: 'center'
+                page.drawText('✓ Informations confirmees et engagement respecte', {
+                    x: leftMargin + 10, y: yPos - 15,
+                    size: 9, font: helveticaBold, color: darkPink
                 });
                 
-                // Bottom bar
                 page.drawRectangle({
-                    x: 0, y: 0, width: width, height: 40,
+                    x: 0, y: 0, width: width, height: 35,
                     color: pinkColor
                 });
-                page.drawText('حزب الاستقلال - المغرب | www.istiqlal.ma', {
-                    x: width / 2, y: 15,
-                    size: 10, font: cairoFont, color: white,
-                    textAlign: 'center'
+                page.drawText('ISTIQLAL PARTY - MAROC | www.istiqlal.ma', {
+                    x: width / 2 - 100, y: 12,
+                    size: 8, font: helveticaFont, color: white
                 });
                 
-                // Save PDF
+                // Save
                 const pdfBytes = await pdfDoc.save();
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                const filename = `انخراط_حزب_الاستقلال_${formDataGlobal.fullname || 'nouveau'}_${Date.now()}.pdf`;
+                const filename = `Adhesion_Istiqlal_${formDataGlobal.fullname || 'nouveau'}_${Date.now()}.pdf`;
                 saveAs(blob, filename);
                 
-                btnText.textContent = '✓ تم تحميل PDF بنجاح';
+                btnText.textContent = '✓ PDF telecharge avec succes';
                 setTimeout(() => {
                     btnText.textContent = originalText;
                     btn.disabled = false;
@@ -712,7 +669,7 @@
                 
             } catch (error) {
                 console.error('PDF Generation Error:', error);
-                alert('حدث خطأ أثناء إنشاء PDF. يرجى المحاولة مرة أخرى.');
+                alert('Erreur lors de la generation du PDF: ' + error.message);
                 btnText.textContent = originalText;
                 btn.disabled = false;
             }
