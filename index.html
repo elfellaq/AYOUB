@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نموذج الانخراط - حزب الاستقلال</title>
+    <title>نموذج الانخراط -منظمة الشبيبة الاستقلالية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -123,6 +126,17 @@
             background: rgba(45, 45, 45, 0.5); border-right: 3px solid #E91E63;
             padding: 12px; border-radius: 8px; margin-bottom: 10px;
         }
+        
+        /* reCAPTCHA Styling */
+        .g-recaptcha {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .g-recaptcha > div {
+            margin: 0 auto;
+        }
+        
         @media screen and (max-width: 768px) {
             input, select, textarea { font-size: 16px !important; }
             .step-indicator { width: 35px; height: 35px; font-size: 14px; }
@@ -330,6 +344,10 @@
                         أؤكد صحة المعلومات وألتزم بقوانين حزب الاستقلال
                     </label>
                 </div>
+                
+                <!-- reCAPTCHA -->
+                <div class="g-recaptcha mt-6" data-sitekey="6LeIxAsTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+                <p id="captchaError" class="text-red-400 text-sm text-center hidden">يرجى إتمام التحقق من reCAPTCHA</p>
             </div>
 
             <div class="flex gap-4 mt-8 pt-6 border-t border-gray-700">
@@ -389,18 +407,26 @@
         <div id="pdfContent"></div>
 
         <!-- Footer -->
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 3px solid #E91E63; text-align: center;">
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 3px solid #E91E63;">
             <div style="background: #FCE4EC; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
                 <p style="color: #C2185B; font-weight: bold; font-size: 16px;">✓ تم تأكيد صحة المعلومات والالتزام بقوانين حزب الاستقلال</p>
             </div>
-            <p style="color: #999; font-size: 12px;">حزب الاستقلال - المغرب | www.istiqlal.ma</p>
+            
+            <!-- Designer Credit -->
+            <div style="text-align: center; margin: 30px 0; padding: 15px; border-top: 1px solid #ddd;">
+                <p style="color: #666; font-size: 14px; margin-bottom: 5px;">تم التصميم بواسطة</p>
+                <p style="color: #E91E63; font-size: 18px; font-weight: bold;">محمد الفلاق</p>
+                <p style="color: #999; font-size: 12px; margin-top: 5px;">Mohamed Fellaq</p>
+            </div>
+            
+            <p style="color: #999; font-size: 12px; text-align: center;">منظمة الشبيبة الاستقلالية بالداخلة | www.istiqlal.info</p>
         </div>
     </div>
 
     <script>
         let currentStep = 1;
         const totalSteps = 5;
-        const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdknPRVpE_TTMG8EVAf49SAGQVz72GbINTKodReAYfe4MGGZl_C1s8I8dF2RL0gjs/exec';
         let formDataGlobal = {};
 
         // ===== Multi-Step Logic =====
@@ -496,7 +522,7 @@
                 const content = document.getElementById('pdfContent');
                 content.innerHTML = `
                     <div style="margin-bottom: 25px;">
-                        <h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;">📋 المعلومات الشخصية</h3>
+                        <h3 style="color: #E91E63; font-size: 22px; margin-bottom: 15px; border-right: 5px solid #E91E63; padding-right: 15px;"> المعلومات الشخصية</h3>
                         <table style="width: 100%; border-collapse: collapse;">
                             <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 35%;"><strong>الاسم الكامل:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.fullname || '-'}</td></tr>
                             <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>تاريخ الازدياد:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">${formDataGlobal.birthdate || '-'}</td></tr>
@@ -589,6 +615,16 @@
         // Form submission to Google Sheets
         document.getElementById('multiStepForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Verify reCAPTCHA
+            const recaptchaResponse = grecaptcha.getResponse();
+            if (recaptchaResponse.length === 0) {
+                document.getElementById('captchaError').classList.remove('hidden');
+                alert('يرجى إتمام التحقق من reCAPTCHA');
+                return;
+            }
+            document.getElementById('captchaError').classList.add('hidden');
+            
             if (!document.getElementById('confirm').checked) {
                 alert('يرجى تأكيد صحة المعلومات');
                 return;
@@ -606,6 +642,9 @@
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
             
+            // Add reCAPTCHA response
+            data.recaptcha = recaptchaResponse;
+            
             const interests = [];
             document.querySelectorAll('input[name="interests"]:checked').forEach(cb => interests.push(cb.value));
             data.interests = interests.join(', ');
@@ -613,17 +652,12 @@
             formDataGlobal = data;
 
             try {
-                if (SCRIPT_URL.includes('YOUR_SCRIPT_ID')) {
-                    console.warn('⚠️ Google Apps Script URL not configured!');
-                    console.log('Data to send:', data);
-                } else {
-                    await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify(data)
-                    });
-                }
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(data)
+                });
                 
                 document.getElementById('multiStepForm').classList.add('hidden');
                 document.querySelector('.flex.gap-4').classList.add('hidden');
@@ -645,6 +679,7 @@
             document.getElementById('multiStepForm').classList.remove('hidden');
             document.querySelector('.flex.gap-4').classList.remove('hidden');
             document.getElementById('successMessage').classList.add('hidden');
+            grecaptcha.reset(); // Reset reCAPTCHA
             currentStep = 1;
             document.querySelectorAll('.step-content').forEach(c => c.classList.remove('active'));
             document.querySelector('.step-content[data-step="1"]').classList.add('active');
