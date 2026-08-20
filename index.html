@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>نموذج الانخراط - حزب الاستقلال</title>
+    <title>نموذج الانخراط - منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -216,7 +216,7 @@
         </div>
 
         <div class="text-center mb-6 sm:mb-8">
-            <h1 class="responsive-title font-bold mb-2 text-pink-400 leading-tight">حزب الاستقلال</h1>
+            <h1 class="responsive-title font-bold mb-2 text-pink-400 leading-tight">منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</h1>
             <p class="responsive-subtitle text-pink-300 font-bold mb-1">ISTIQLAL PARTY</p>
             <p class="responsive-text text-gray-400">نموذج انخراط الشبيبة الاستقلالية</p>
         </div>
@@ -294,7 +294,7 @@
                         <input type="email" id="email" name="email" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="exemple@email.com">
                     </div>
                     <div>
-                        <label class="input-label block text-sm mb-2">البريد البديل</label>
+                        <label class="input-label block text-sm mb-2">البطاقة الوطنية</label>
                         <input type="email" id="email2" name="email2" class="input-field w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3" placeholder="اختياري">
                     </div>
                 </div>
@@ -406,7 +406,7 @@
                 <div class="flex items-start gap-3 p-3 sm:p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg sm:rounded-xl">
                     <input type="checkbox" id="confirm" name="confirm" required class="w-4 h-4 sm:w-5 sm:h-5 mt-1 rounded border-yellow-500 flex-shrink-0">
                     <label for="confirm" class="text-sm text-yellow-200">
-                        أؤكد صحة المعلومات وألتزم بقوانين حزب الاستقلال
+                        أؤكد صحة المعلومات وألتزم بقوانين منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب
                     </label>
                 </div>
 
@@ -434,20 +434,14 @@
         <div id="successMessage" class="hidden text-center py-8 sm:py-10">
             <div class="success-checkmark mb-4 sm:mb-6"></div>
             <h2 class="text-2xl sm:text-3xl font-bold text-emerald-400 mb-2 sm:mb-3">تم التسجيل بنجاح!</h2>
-            <p class="text-gray-300 mb-2 text-base sm:text-lg">شكرا لانضمامك لحزب الاستقلال</p>
+            <p class="text-gray-300 mb-2 text-base sm:text-lg">شكرا لانضمامك لمنظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</p>
             <p class="text-pink-300 text-sm mb-4 sm:mb-6">Inscription réussie avec succès</p>
             <div class="bg-gray-800/50 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
                 <p class="text-sm text-gray-400 mb-2">سيتم التواصل معك على:</p>
                 <p class="text-pink-400 font-bold text-sm sm:text-base break-all" id="successContact"></p>
             </div>
 
-            <button onclick="generateArabicPDF()" id="pdfBtn"
-                class="btn-pdf px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-bold flex items-center justify-center gap-2 mx-auto mb-3 sm:mb-4 w-full sm:w-auto">
-                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <span id="pdfBtnText">تحميل نسخة PDF</span>
-            </button>
+       
 
             <button onclick="resetForm()" class="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-pink-500 text-pink-400 rounded-lg sm:rounded-xl hover:bg-pink-500 hover:text-white transition-all duration-300 font-bold w-full sm:w-auto">
                 تسجيل انخراط جديد
@@ -458,7 +452,7 @@
     <!-- FIX 8 : plus de style inline (il écrasait le CSS) -->
     <div id="pdfTemplate" aria-hidden="true">
         <div style="background: linear-gradient(135deg, #E91E63, #C2185B); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
-            <h1 style="color: white; font-size: 36px; margin-bottom: 10px; font-weight: 800;">حزب الاستقلال</h1>
+            <h1 style="color: white; font-size: 36px; margin-bottom: 10px; font-weight: 800;">منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</h1>
             <h2 style="color: #FCE4EC; font-size: 20px; margin-bottom: 5px;">ISTIQLAL PARTY</h2>
             <p style="color: white; font-size: 18px; margin-top: 15px;">استمارة انخراط الشبيبة الاستقلالية</p>
             <p style="color: #FCE4EC; font-size: 14px; margin-top: 10px;">Formulaire d'adhésion - Jeunesse Indépendante</p>
@@ -469,14 +463,14 @@
         <div id="pdfContent"></div>
         <div style="margin-top: 40px; padding-top: 20px; border-top: 3px solid #E91E63;">
             <div style="background: #FCE4EC; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <p style="color: #C2185B; font-weight: bold; font-size: 16px;">✓ تم تأكيد صحة المعلومات والالتزام بقوانين حزب الاستقلال</p>
+                <p style="color: #C2185B; font-weight: bold; font-size: 16px;">✓ تم تأكيد صحة المعلومات والالتزام بقوانين منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب</p>
             </div>
             <div style="text-align: center; margin: 30px 0; padding: 15px; border-top: 1px solid #ddd;">
                 <p style="color: #666; font-size: 14px; margin-bottom: 5px;">تم التصميم بواسطة</p>
                 <p style="color: #E91E63; font-size: 18px; font-weight: bold;">محمد الفلاق</p>
                 <p style="color: #999; font-size: 12px; margin-top: 5px;">Mohamed Fellag</p>
             </div>
-            <p style="color: #999; font-size: 12px; text-align: center;">حزب الاستقلال - المغرب | www.istiqlal.ma</p>
+            <p style="color: #999; font-size: 12px; text-align: center;">منظمة الشبيبة الاستقلالية بالجهة الداخلة وادي الذهب - المغرب | www.istiqlal.ma</p>
         </div>
     </div>
 
